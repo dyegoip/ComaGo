@@ -144,7 +144,7 @@ export class LoginPage implements OnInit {
                 this.userApi = data[0];
                 const userId = this.userApi.id;
                 const userApi = this.userApi.userName;
-                const passApi = this.userApi.pass;
+                const passApi = this.userApi.password;
           
                 console.log('Nombre de usuario: ' + userApi + ' - ' + userValue);
                 console.log('Contraseña: ' + passApi + ' - ' + passValue);
