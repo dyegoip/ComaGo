@@ -4,6 +4,8 @@ import { NavigationExtras, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 import { User } from '../user/user.page';
+import { SQLiteService } from '../services/sqlite.service';
+
 
 @Component({
   selector: 'app-add-user',
@@ -19,6 +21,7 @@ export class AddUserPage implements OnInit {
   constructor(private formBuilder: FormBuilder, 
               private apiService: ApiService, 
               private alertController: AlertController,
+              private sqliteService: SQLiteService,
               private router: Router ) { }
 
   ngOnInit() {
@@ -60,6 +63,13 @@ export class AddUserPage implements OnInit {
     if (this.userForm.valid) {
       const newUser = this.userForm.value;
       newUser.id = this.nextId;
+
+      await this.sqliteService.db.execute(
+        'INSERT INTO users (id, userName, fullName, email, password) VALUES (?, ?, ?, ?, ?)',
+        false,
+        [newUser.id, newUser.userName, newUser.fullName, newUser.email, newUser.password] // Los parámetros deben ir aquí
+      );
+      
 
       this.apiService.addUser(newUser).subscribe(async response => {
         console.log('Usuario añadido exitosamente', response);
