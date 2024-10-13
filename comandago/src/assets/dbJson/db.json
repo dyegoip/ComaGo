@@ -7,6 +7,13 @@
       "stock": 10,
       "active": false,
       "type": "Guarnicion"
+    },
+    {
+      "id": "2",
+      "productName": "Chorrillana",
+      "price": 5600,
+      "stock": 10,
+      "type": "Guarnicion"
     }
   ],
   "users": [

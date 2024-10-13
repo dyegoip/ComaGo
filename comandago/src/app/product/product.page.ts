@@ -36,6 +36,10 @@ export class ProductPage implements OnInit {
     this.router.navigate(['/add-product']);
   }
 
+  onInputChange(event: any) {
+    this.searchQuery = event.target.value; // Actualizar la variable con el valor del input
+  }
+
   searchProduct() {
     this.apiService.getProducts().subscribe(
       (data: Product[]) => {
@@ -67,5 +71,46 @@ export class ProductPage implements OnInit {
         this.filteredProducts = [];
       }
     );
+  }
+
+  onEditProduct(product: Product) {
+    const navigationExtras: NavigationExtras = {
+      state: {
+        productEdit: product
+      },
+    }
+    console.log('Editar Producto:', product.productName);
+
+    this.router.navigate(['/edit-product'], navigationExtras).then(() => {
+      window.location.reload();
+    });
+  }
+
+  async onDeleteProduct(product: Product) {
+    // Lógica para eliminar usuario
+    console.log('Eliminar producto:', product.productName);
+    // Crear y mostrar el alert
+    const alert = await this.alertController.create({
+      header: 'Eliminar Producto',
+      message: '¿Está seguro que desea eliminar el producto ' + product.productName + '?',
+      buttons: [
+        {
+          text: 'Cancelar', // Agrega un botón para cancelar la acción
+          role: 'cancel',
+          handler: () => {
+            console.log('Canceló la eliminación del producto.');
+          }
+        },
+        {
+          text: 'Confirmar',
+          role: 'confirm',
+          handler: async () => {
+            await this.deleteUserApi(user);
+          }
+        }
+      ],
+    });
+  
+    await alert.present();
   }
 }

@@ -26,8 +26,9 @@ export class AddProductPage implements OnInit {
     this.productForm = this.formBuilder.group({
       id: ['', []],
       productName: ['', [Validators.required]],
-      price: ['', [Validators.required, Validators.pattern("^[0-9]*$")]], // Valida solo números para el precio
+      price: ['', [Validators.required, Validators.pattern("^[0-9]*$")]],
       stock: ['', [Validators.required, Validators.min(0)]],
+      active: ['',[]],
       type: ['', [Validators.required]],
     });
   }
@@ -56,6 +57,7 @@ export class AddProductPage implements OnInit {
     if (this.productForm.valid) {
       const newProduct = this.productForm.value;
       newProduct.id = this.nextId;
+      newProduct.active = "false";
 
       this.apiService.addProduct(newProduct).subscribe(async response => {
         console.log('Producto añadido exitosamente', response);
