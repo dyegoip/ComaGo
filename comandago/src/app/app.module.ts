@@ -9,11 +9,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CapacitorSQLite } from '@capacitor-community/sqlite';
+import { SQLite, SQLiteOriginal } from '@awesome-cordova-plugins/sqlite';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [AppRoutingModule, BrowserModule, IonicModule.forRoot(), RouterModule, HttpClientModule, CommonModule, FormsModule],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, provideAnimationsAsync() ],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, provideAnimationsAsync(), SQLiteOriginal ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -1,3 +1,4 @@
+import { SQLiteService } from './../services/sqlite.service';
 import { User } from './../user/user.page';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
@@ -5,6 +6,8 @@ import { Router, RouterLink } from '@angular/router';
 import { IonicModule, MenuController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Injectable } from '@angular/core';
+import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
 
 @Component({
   selector: 'app-home',
@@ -22,7 +25,7 @@ export class HomePage implements OnInit {
   userAuth!: User;
   public image: string = "";
 
-  constructor(private router: Router, private apiService: ApiService, private menu: MenuController) {}
+  constructor(private router: Router, private apiService: ApiService, private menu: MenuController, public db: SQLiteService) {}
 
   ngOnInit() {
     const navigation = this.router.getCurrentNavigation();
@@ -73,5 +76,17 @@ export class HomePage implements OnInit {
     });
 
     this.image = `data:image/jpeg;base64,${image.base64String}`;  // Puedes mostrar esta imagen en el HTML
+  }
+
+  async createUserTest(){
+    const newUser = {
+      id: '1',
+      userName: 'testuser',
+      fullName: 'Test User',
+      email: 'testuser@example.com',
+      password: 'password123'
+    };
+    
+    this.db.createUser(newUser);
   }
 }

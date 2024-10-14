@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import {SQLite} from '@awesome-cordova-plugins/sqlite';
 
 @Injectable({
   providedIn: 'root',
@@ -35,11 +36,8 @@ export class SQLiteService {
   }
 
   // Método para crear la tabla de usuarios
-  async createTableUser() {
-    if (!this.db) {
-      await this.openDatabase(); // Abre la base de datos si aún no está abierta
-    }
-    
+  async createTableUser() {  
+    console.log(this.db); 
     if (this.db) { // Asegúrate de que db no es null antes de ejecutar consultas
       try {
         await this.db.query(`
@@ -62,10 +60,8 @@ export class SQLiteService {
 
   // Método para insertar un usuario
   async createUser(newUser: any) {
-    if (!this.db) {
-      await this.openDatabase(); // Abre la base de datos si aún no está abierta
-      await this.createTableUser();
-    }
+
+    await this.createTableUser();
 
     if (this.db) { // Verifica que db no es null
       try {

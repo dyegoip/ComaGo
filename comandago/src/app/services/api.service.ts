@@ -8,7 +8,7 @@ import { Product } from '../product/product.page'
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:3000';  // La URL de la API externa
+  private apiUrl = 'http://192.168.84.40:3000';  // La URL de la API externa
 
   constructor(private http: HttpClient) {}
 
