@@ -30,6 +30,7 @@ export class ProductPage implements OnInit {
               private alertController: AlertController) { }
 
   ngOnInit() {
+    this.getProductInit();
   }
 
   ToAddProduct() {
@@ -48,25 +49,46 @@ export class ProductPage implements OnInit {
           showOptions: false // Inicializar showOptions en false
         }));
         this.allProducts = data;
-        this.filteredProducts = data;  // Al principio, no hay filtro, así que mostramos todos los usuarios
+        this.filteredProducts = data;  // Al principio, no hay filtro, así que mostramos todos los productos
       
         if (this.searchQuery.trim() === '') {
-          this.filteredProducts = this.allProducts;  // Si el input está vacío, mostramos todos los usuarios
+          this.filteredProducts = this.allProducts;  // Si el input está vacío, mostramos todos los productos
           return;
         }
     
-        // Filtrar los usuarios basándose en el nombre completo o producto
+        // Filtrar los productos basándose en el nombre completo o producto
         this.filteredProducts = this.allProducts.filter(product =>
           product.productName.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
           product.productName.toLowerCase().includes(this.searchQuery.toLowerCase())
         );
     
-        // Controlar si se encontraron usuarios
+        // Controlar si se encontraron productos
         this.find = this.filteredProducts.length > 0;
 
       },
       (error) => {
-        console.error('Error al traer los usuarios:', error);
+        console.error('Error al traer los productos:', error);
+        this.allProducts = [];
+        this.filteredProducts = [];
+      }
+    );
+  }
+
+  getProductInit() {
+    this.apiService.getProducts().subscribe(
+      (data: Product[]) => {
+        this.allProducts = data.map(product => ({
+          ...product,
+          showOptions: false // Inicializar showOptions en false
+        }));
+        this.allProducts = data;
+        this.filteredProducts = data;  // Al principio, no hay filtro, así que mostramos todos los productos
+        // Controlar si se encontraron productos
+        this.find = this.filteredProducts.length > 0;
+
+      },
+      (error) => {
+        console.error('Error al traer los productos:', error);
         this.allProducts = [];
         this.filteredProducts = [];
       }

@@ -5,7 +5,7 @@
       "productName": "Tallarines",
       "price": "6000",
       "stock": "100",
-      "active": "",
+      "active": "false",
       "type": "Guarnicion"
     },
     {
@@ -13,7 +13,16 @@
       "productName": "Chorrillana",
       "price": 5600,
       "stock": 10,
+      "active": "false",
       "type": "Guarnicion"
+    },
+    {
+      "id": "3",
+      "productName": "Coca-cola",
+      "price": 1500,
+      "stock": 50,
+      "active": "false",
+      "type": "Liquidos"
     }
   ],
   "users": [
