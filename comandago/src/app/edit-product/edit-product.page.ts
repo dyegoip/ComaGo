@@ -38,6 +38,7 @@ export class EditProductPage implements OnInit {
         productName: productEdit.productName,
         price: productEdit.price,
         stock: productEdit.stock,
+        active: "false",
         type: productEdit.type
       });
     } else {
