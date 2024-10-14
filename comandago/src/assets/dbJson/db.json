@@ -30,6 +30,13 @@
       "fullName": "Diego Peñaloza",
       "email": "die.penaloza@duocuc.cl",
       "password": "123456"
+    },
+    {
+      "id": "4",
+      "userName": "rafu",
+      "fullName": "rafu",
+      "email": "rafu@rafu.cl",
+      "password": "123456"
     }
   ]
 }
