@@ -8,33 +8,29 @@ export class SQLiteService {
   public db: SQLiteDBConnection | null = null;
 
   constructor() {
-    this.initializeDatabase(); // Inicializa la base de datos al crear el servicio
-  }
-
-  // Método para inicializar la base de datos
-  async initializeDatabase() {
-    await this.openDatabase();
-    await this.createTableUser();
+    this.openDatabase(); // Abre la base de datos al inicializar el servicio
   }
 
   // Método para abrir la base de datos
-  async openDatabase(): Promise<SQLiteDBConnection | null> {
+  async openDatabase(): Promise<void> {
     try {
       // Crea la conexión correctamente con await
-      this.db = await CapacitorSQLite.createConnection({
+      await CapacitorSQLite.createConnection({
         database: 'mydb',
         encrypted: false,
         mode: 'no-encryption',
-        version: 1
+        version: 1,
       });
   
-      // Abre la base de datos
-      await this.db.open();
-      console.log('Base de datos abierta correctamente');
-      return this.db; // Retorna la conexión abierta
+      // Verifica si la conexión fue exitosa antes de abrirla
+      if (this.db) {
+        await this.db.open(); // Solo llamamos a open si this.db no es null
+        console.log('Base de datos abierta correctamente');
+      } else {
+        console.error('No se pudo obtener una conexión válida');
+      }
     } catch (error) {
       console.error('Error al abrir la base de datos:', error);
-      return null; // Retorna null si hay un error
     }
   }
 

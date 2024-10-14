@@ -79,7 +79,7 @@ export class ProductPage implements OnInit {
         productEdit: product
       },
     }
-    console.log('Editar Producto:', product.productName);
+    console.log('Editar Producto:', product);
 
     this.router.navigate(['/edit-product'], navigationExtras).then(() => {
       window.location.reload();

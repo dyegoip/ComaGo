@@ -32,13 +32,13 @@ export class EditProductPage implements OnInit {
   const navigation = this.router.getCurrentNavigation();
     if (navigation && navigation.extras.state && navigation.extras.state['productEdit'] != null) {
       const productEdit = navigation.extras.state['productEdit'];
-
+      console.log(productEdit);
       this.productForm.patchValue({
         id: productEdit.id,
         productName: productEdit.productName,
-        price: productEdit.fullName,
-        stock: productEdit.email,
-        type: productEdit.password
+        price: productEdit.price,
+        stock: productEdit.stock,
+        type: productEdit.type
       });
     } else {
       console.log('No hay producto');
