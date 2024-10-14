@@ -27,6 +27,7 @@ import { ApiService } from '../services/api.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
+
 export class LoginPage implements OnInit {
   
   userApi: any = null;
@@ -135,52 +136,45 @@ export class LoginPage implements OnInit {
           await alert.present();
           return;
         }
-  
-        // Validar credenciales
-        // if (userValue === userStorage && passValue === passStorage) {
-          this.apiService.getUserByUserName(userValue).subscribe(
-            async (data: any) => {
-              if (data.length > 0) {
-                this.userApi = data[0];
-                const userId = this.userApi.id;
-                const userApi = this.userApi.userName;
-                const passApi = this.userApi.password;
-          
-                console.log('Nombre de usuario: ' + userApi + ' - ' + userValue);
-                console.log('Contraseña: ' + passApi + ' - ' + passValue);
-          
-                // Verifica las credenciales aquí
-                if (userValue == userApi && passValue == passApi) {
-                  sessionStorage.setItem('isAuthenticated', 'true');
-                  sessionStorage.setItem('userId', userId);
-                  const alert = await this.alertController.create({
-                    header: 'Login Exitoso',
-                    message: 'Bienvenido/a ' + this.userApi.fullName,
-                    buttons: [
-                      {
-                        text: 'Aceptar',
-                        handler: () => {
-                          const navigationExtras: NavigationExtras = {
-                            state: {
-                              userId: userId
-                            }
-                          };
-                          this.router.navigate(['/home'], navigationExtras).then(() => {
-                            window.location.reload();
-                          });
-                        }
+
+        console.log('Nombre de usuario error: ' +  userValue);
+        console.log('Contraseña: ' + passValue);
+
+        this.apiService.getUserByUserName(userValue).subscribe(
+          async (data: any) => {
+            if (data.length > 0) {
+              this.userApi = data[0];
+              const userId = this.userApi.id;
+              const userApi = this.userApi.userName;
+              const passApi = this.userApi.password;
+        
+              console.log('Nombre de usuario: ' + userApi + ' - ' + userValue);
+              console.log('Contraseña: ' + passApi + ' - ' + passValue);
+        
+              // Verifica las credenciales aquí
+              if (userValue == userApi && passValue == passApi) {
+                sessionStorage.setItem('isAuthenticated', 'true');
+                sessionStorage.setItem('userId', userId);
+                const alert = await this.alertController.create({
+                  header: 'Login Exitoso',
+                  message: 'Bienvenido/a ' + this.userApi.fullName,
+                  buttons: [
+                    {
+                      text: 'Aceptar',
+                      handler: () => {
+                        const navigationExtras: NavigationExtras = {
+                          state: {
+                            userId: userId
+                          }
+                        };
+                        this.router.navigate(['/home'], navigationExtras).then(() => {
+                          window.location.reload();
+                        });
                       }
-                    ],
-                  });
-                  await alert.present();
-                } else {
-                  const alert = await this.alertController.create({
-                    header: 'Credenciales Inválidas',
-                    message: 'Nombre de usuario y/o contraseña incorrectos.',
-                    buttons: ['Aceptar'],
-                  });
-                  await alert.present();
-                }
+                    }
+                  ],
+                });
+                await alert.present();
               } else {
                 const alert = await this.alertController.create({
                   header: 'Credenciales Inválidas',
@@ -189,12 +183,27 @@ export class LoginPage implements OnInit {
                 });
                 await alert.present();
               }
-            },
-            (error) => {
-              console.error('Error al obtener el usuario:', error);
+            } else {
+              const alert = await this.alertController.create({
+                header: 'Credenciales Inválidas',
+                message: 'Nombre de usuario y/o contraseña incorrectos.',
+                buttons: ['Aceptar'],
+              });
+              await alert.present();
             }
-          );
-          
+          },
+          async (error) => {
+            const errorMessage = error.message;
+            console.error('Error al conectar con la API: ', error); // Registra el error completo en la consola para depuración
+
+            const alert = await this.alertController.create({
+              header: 'Error de conexión',
+              message: errorMessage, // Usar mensaje específico si está disponible
+              buttons: ['Aceptar'],
+            });
+            await alert.present();
+          }
+        );
       });
     });
   }

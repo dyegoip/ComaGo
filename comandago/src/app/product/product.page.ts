@@ -105,7 +105,7 @@ export class ProductPage implements OnInit {
           text: 'Confirmar',
           role: 'confirm',
           handler: async () => {
-            await this.deleteUserApi(user);
+            await this.onDeleteProduct(product);
           }
         }
       ],
