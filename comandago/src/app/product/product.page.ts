@@ -105,7 +105,7 @@ export class ProductPage implements OnInit {
           text: 'Confirmar',
           role: 'confirm',
           handler: async () => {
-            await this.deleteUserApi(user);
+            await this.deleteProductApi(product);
           }
         }
       ],
@@ -113,4 +113,34 @@ export class ProductPage implements OnInit {
   
     await alert.present();
   }
+
+  async deleteProductApi(productDelete: Product) {
+    try {
+      const response = await this.apiService.deleteProduct(productDelete.id.toString()).toPromise();
+      console.log('Usuario eliminado exitosamente', response);
+      const alert = await this.alertController.create({
+        header: 'Eliminar Usuario',
+        message: 'Usuario ' + productDelete.productName + ' eliminado éxitosamente',
+        buttons: [
+          {
+            text: 'Cerrar',
+            role: 'confirm',
+            handler: () => {
+              this.searchProduct();
+              console.log('');
+            }
+          }
+        ]
+      });
+      await alert.present(); // Muestra la alerta
+    } catch (error) {
+      console.error('Error eliminando el usuario:', error);
+    }
+  }
+
+  onViewProductDetails(product: Product) {
+    // Lógica para ver detalles del usuario
+    console.log('Ver detalles de usuario:', product.productName);
+  }
+
 }

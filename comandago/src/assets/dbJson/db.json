@@ -2,10 +2,10 @@
   "products": [
     {
       "id": "1",
-      "productName": "Pure",
-      "price": 5000,
-      "stock": 10,
-      "active": false,
+      "productName": "Tallarines",
+      "price": "6000",
+      "stock": "100",
+      "active": "",
       "type": "Guarnicion"
     },
     {
