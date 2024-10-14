@@ -81,4 +81,8 @@ export class ApiService {
   deleteProduct(productId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/products/${productId}`);
   }
+
+  editProduct(product: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/products/${product.id}`, product);
+  }
 }
