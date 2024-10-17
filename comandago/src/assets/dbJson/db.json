@@ -46,6 +46,14 @@
       "fullName": "rafu",
       "email": "rafu@rafu.cl",
       "password": "123456"
+    },
+    {
+      "id": "5",
+      "userName": "rafuqui",
+      "fullName": "Rafu Quicihiz",
+      "email": "raquichiz@duoc.cl",
+      "rol": "1",
+      "password": "123456"
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { SQLiteService } from './../services/sqlite.service';
+import { SQliteService } from './../services/sqlite.service';
 import { User } from './../user/user.page';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
@@ -6,16 +6,14 @@ import { Router, RouterLink } from '@angular/router';
 import { IonicModule, MenuController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { Injectable } from '@angular/core';
-import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule
-  ],
+  imports: [CommonModule, IonicModule],
+  providers: [SQliteService, ApiService]
 })
 export class HomePage implements OnInit {
 
@@ -23,11 +21,13 @@ export class HomePage implements OnInit {
   userId!: string;
   userApi: any = {};
   userAuth!: User;
+  newUser!: User;
   public image: string = "";
 
-  constructor(private router: Router, private apiService: ApiService, private menu: MenuController, public db: SQLiteService) {}
+  constructor(private router: Router, private apiService: ApiService, private menu: MenuController, private sqliteService: SQliteService, ) {}
 
   ngOnInit() {
+
     const navigation = this.router.getCurrentNavigation();
     if (navigation && navigation.extras.state && navigation.extras.state['userId'] != null) {
       this.userId = navigation.extras.state['userId'];
@@ -78,15 +78,5 @@ export class HomePage implements OnInit {
     this.image = `data:image/jpeg;base64,${image.base64String}`;  // Puedes mostrar esta imagen en el HTML
   }
 
-  async createUserTest(){
-    const newUser = {
-      id: '1',
-      userName: 'testuser',
-      fullName: 'Test User',
-      email: 'testuser@example.com',
-      password: 'password123'
-    };
-    
-    this.db.createUser(newUser);
-  }
+  
 }

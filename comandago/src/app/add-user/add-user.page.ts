@@ -4,7 +4,7 @@ import { NavigationExtras, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 import { User } from '../user/user.page';
-import { SQLiteService } from '../services/sqlite.service';
+import { SQliteService } from '../services/sqlite.service';
 
 
 @Component({
@@ -21,18 +21,32 @@ export class AddUserPage implements OnInit {
   constructor(private formBuilder: FormBuilder, 
               private apiService: ApiService, 
               private alertController: AlertController,
-              private sqliteService: SQLiteService,
+              private sqliteService: SQliteService,
               private router: Router ) { }
 
   ngOnInit() {
+    this.initializeDatabase();
+
     this.getUsersFromApi();
+    
     this.userForm = this.formBuilder.group({
       id: ['',[]],
       userName: ['', [Validators.required]],
       fullName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
+      rol: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
+  }
+
+  async initializeDatabase() {
+    try {
+      // Iniciar la base de datos
+      await this.sqliteService.initDB();
+      console.log('Base de datos inicializada correctamente');
+    } catch (error) {
+      console.error('Error al inicializar la base de datos:', error);
+    }
   }
   navigateToUser() {
     this.router.navigate(['/user']);
@@ -64,7 +78,7 @@ export class AddUserPage implements OnInit {
       const newUser = this.userForm.value;
       newUser.id = this.nextId;
 
-      await this.sqliteService.createUser(newUser);
+      await this.sqliteService.addUser(newUser);
 
       this.apiService.addUser(newUser).subscribe(async response => {
         console.log('Usuario añadido exitosamente', response);
