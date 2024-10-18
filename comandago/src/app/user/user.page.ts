@@ -2,6 +2,7 @@ import { ApiService } from './../services/api.service';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+import { SQliteService } from '../services/sqlite.service';
 
 export interface User {
   id: number;
@@ -23,14 +24,27 @@ export interface User {
 export class UserPage implements OnInit {
   allUsers : User[] = [];
   filteredUsers: User[] = [];
+  findUsers: User[] | null = [];
   searchQuery: string = '';
   find: boolean = false;
   
   constructor(private router: Router, 
-              private apiService: ApiService, 
+              private apiService: ApiService,
+              private sqliteService: SQliteService,
               private alertController: AlertController) { }
 
   ngOnInit() {
+    this.initializeDatabase();
+  }
+
+  async initializeDatabase() {
+    try {
+      // Iniciar la base de datos
+      await this.sqliteService.initDB();
+      console.log('Base de datos inicializada correctamente');
+    } catch (error) {
+      console.error('Error al inicializar la base de datos:', error);
+    }
   }
 
   onInputChange(event: any) {
@@ -68,6 +82,18 @@ export class UserPage implements OnInit {
         this.filteredUsers = [];
       }
     );
+  }
+
+  async getUserLikebyName(){
+    this.findUsers = await this.sqliteService.getUserLikeByName(this.searchQuery);
+
+    console.log(this.findUsers);
+
+    if(this.findUsers != null)
+    {
+      this.filteredUsers = this.findUsers;
+      this.find = this.filteredUsers.length > 0;
+    }
   }
 
   toggleOptions(userSelect: User) {

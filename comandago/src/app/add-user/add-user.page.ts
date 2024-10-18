@@ -48,6 +48,7 @@ export class AddUserPage implements OnInit {
       console.error('Error al inicializar la base de datos:', error);
     }
   }
+  
   navigateToUser() {
     this.router.navigate(['/user']);
   }

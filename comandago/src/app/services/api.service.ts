@@ -8,7 +8,9 @@ import { Product } from '../product/product.page'
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://192.168.1.93:3000';  // La URL de la API externa
+  //private apiUrl = 'http://localhost:3000';
+  //private apiUrl = 'http://192.168.1.93:3000';
+  private apiUrl = 'http://192.168.84.40:3000';
 
   constructor(private http: HttpClient) {}
 
@@ -32,7 +34,6 @@ export class ApiService {
   }
 
   getUserByUserName(userName: string) {
-    console.log(this.http.get(`${this.apiUrl}/users/?userName=${userName}`));
     return this.http.get(`${this.apiUrl}/users/?userName=${userName}`);
   }
 

@@ -54,6 +54,46 @@
       "email": "raquichiz@duoc.cl",
       "rol": "1",
       "password": "123456"
+    },
+    {
+      "id": "6",
+      "userName": "dyego",
+      "fullName": "Dyego Pena",
+      "email": "diego@duoc.cl",
+      "rol": "1",
+      "password": "123456"
+    },
+    {
+      "id": "7",
+      "userName": "dyego",
+      "fullName": "dyego pena",
+      "email": "dyego@duoc.cl",
+      "rol": "1",
+      "password": "123456"
+    },
+    {
+      "id": "8",
+      "userName": "dyego",
+      "fullName": "dyego pena",
+      "email": "dyego@duoc.cl",
+      "rol": "1",
+      "password": "123456"
+    },
+    {
+      "id": "9",
+      "userName": "dyego",
+      "fullName": "dyego pena",
+      "email": "dyego@duoc.cl",
+      "rol": "1",
+      "password": "123456"
+    },
+    {
+      "id": "10",
+      "userName": "dyego",
+      "fullName": "dyego pena",
+      "email": "dyego@duoc.cl",
+      "rol": "1",
+      "password": "123456"
     }
   ]
 }
