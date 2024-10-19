@@ -40,7 +40,8 @@ export class UserPage implements OnInit {
   async initializeDatabase() {
     try {
       // Iniciar la base de datos
-      await this.sqliteService.initDB();
+      //await this.sqliteService.initDB();
+      await this.sqliteService.updateUserTable();
       console.log('Base de datos inicializada correctamente');
     } catch (error) {
       console.error('Error al inicializar la base de datos:', error);
@@ -51,50 +52,53 @@ export class UserPage implements OnInit {
     this.searchQuery = event.target.value; // Actualizar la variable con el valor del input
   }
 
-  searchUser() {
-    this.apiService.getUsers().subscribe(
-      (data: User[]) => {
-        this.allUsers = data.map(user => ({
-          ...user,
-          showOptions: false // Inicializar showOptions en false
-        }));
-        this.allUsers = data;
-        this.filteredUsers = data;  // Al principio, no hay filtro, así que mostramos todos los usuarios
-      
-        if (this.searchQuery.trim() === '') {
-          this.filteredUsers = this.allUsers;  // Si el input está vacío, mostramos todos los usuarios
-          return;
-        }
-    
-        // Filtrar los usuarios basándose en el nombre completo o username
-        this.filteredUsers = this.allUsers.filter(user =>
-          user.fullName.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          user.userName.toLowerCase().includes(this.searchQuery.toLowerCase())
+  async getUserLikebyName() {
+    try {
+      const isConect = await this.apiService.checkApiConnection().toPromise();
+  
+      if (isConect) {
+        this.apiService.getUsers().subscribe(
+          (data: User[]) => {
+            this.allUsers = data.map(user => ({
+              ...user,
+              showOptions: false 
+            }));
+            this.filteredUsers = this.allUsers;
+            
+            if (this.searchQuery.trim() === '') {
+              this.filteredUsers = this.allUsers;
+            } else {
+              this.filteredUsers = this.allUsers.filter(user =>
+                user.fullName.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                user.userName.toLowerCase().includes(this.searchQuery.toLowerCase())
+              );
+            }
+            this.find = this.filteredUsers.length > 0;
+          },
+          (error) => {
+            console.error('Error al traer los usuarios desde la API:', error);
+            this.allUsers = [];
+            this.filteredUsers = [];
+          }
         );
-    
-        // Controlar si se encontraron usuarios
-        this.find = this.filteredUsers.length > 0;
-
-      },
-      (error) => {
-        console.error('Error al traer los usuarios:', error);
-        this.allUsers = [];
-        this.filteredUsers = [];
+      } else {
+        const localUsers = await this.sqliteService.getUserLikeByName(this.searchQuery);
+  
+        if (localUsers) {
+          this.filteredUsers = localUsers;
+          this.find = localUsers.length > 0;
+        } else {
+          this.filteredUsers = [];
+          this.find = false;
+        }
       }
-    );
-  }
-
-  async getUserLikebyName(){
-    this.findUsers = await this.sqliteService.getUserLikeByName(this.searchQuery);
-
-    console.log(this.findUsers);
-
-    if(this.findUsers != null)
-    {
-      this.filteredUsers = this.findUsers;
-      this.find = this.filteredUsers.length > 0;
+    } catch (error) {
+      console.error('Error verificando la conexión o trayendo los datos:', error);
+      this.allUsers = [];
+      this.filteredUsers = [];
     }
   }
+  
 
   toggleOptions(userSelect: User) {
     this.filteredUsers.forEach(user => {
@@ -145,30 +149,39 @@ export class UserPage implements OnInit {
   
   async deleteUserApi(userDelete: User) {
     try {
-      const response = await this.apiService.deleteUser(userDelete.id.toString()).toPromise(); // Asumiendo que tienes un método deleteUser en tu ApiService
-      console.log('Usuario eliminado exitosamente', response);
-      const alert = await this.alertController.create({
-        header: 'Eliminar Usuario',
-        message: 'Usuario ' + userDelete.fullName + ' eliminado éxitosamente',
-        buttons: [
-          {
-            text: 'Cerrar', // Agrega un botón para cancelar la acción
-            role: 'confirm',
-            handler: () => {
-              this.searchUser();
-              console.log('');
+      const userNameDel = userDelete.userName.toString();
+      const isConect = await this.apiService.checkApiConnection().toPromise(); // Convertir el observable a promesa
+  
+      if (!isConect) {
+        // Eliminar localmente usando SQLite
+        await this.sqliteService.delUser(userNameDel);
+        console.log('Usuario eliminado localmente');
+      } else {
+        // Eliminar usuario de la API
+        const response = await this.apiService.deleteUser(userDelete.id.toString()).toPromise();
+        console.log('Usuario eliminado exitosamente', response);
+  
+        // Mostrar alerta de confirmación
+        const alert = await this.alertController.create({
+          header: 'Eliminar Usuario',
+          message: `Usuario ${userDelete.fullName} eliminado éxitosamente`,
+          buttons: [
+            {
+              text: 'Cerrar',
+              role: 'confirm',
+              handler: () => {
+                this.getUserLikebyName(); // Actualizar la lista de usuarios
+              }
             }
-          }
-        ],
-      });
-    
-      await alert.present();
+          ]
+        });
+  
+        await alert.present();
+      }
     } catch (error) {
       console.error('Error al eliminar el usuario', error);
-      // Aquí puedes mostrar un mensaje de error al usuario si es necesario
     }
   }
-  
 
   onViewDetails(user: User) {
     // Lógica para ver detalles del usuario

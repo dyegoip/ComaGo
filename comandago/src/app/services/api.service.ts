@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, map, Observable, of, throwError, timeout } from 'rxjs';
 import { User } from '../user/user.page';
 import { Product } from '../product/product.page'
 
@@ -9,10 +9,18 @@ import { Product } from '../product/product.page'
 })
 export class ApiService {
   //private apiUrl = 'http://localhost:3000';
-  //private apiUrl = 'http://192.168.1.93:3000';
-  private apiUrl = 'http://192.168.84.40:3000';
+  private apiUrl = 'http://192.168.1.93:3000';
+  //private apiUrl = 'http://192.168.84.40:3000';
 
   constructor(private http: HttpClient) {}
+  
+  checkApiConnection(): Observable<boolean> {
+    return this.http.get(`${this.apiUrl}/users`).pipe(
+      timeout(2500),
+      map(() => true),
+      catchError(() => of(false))
+    );
+  }
 
   // Método para realizar una petición GET a la API
   getData(): Observable<any> {

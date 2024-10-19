@@ -24,9 +24,9 @@ export class SQliteService {
       await this.dbInstance.executeSql(`
         CREATE TABLE IF NOT EXISTS USER (
           IDUSER TEXT PRIMARY KEY,
-          USERNAME TEXT,
+          USERNAME TEXT UNIQUE,
           FULLNAME TEXT,
-          EMAIL TEXT,
+          EMAIL TEXT UNIQUE,
           PASSWORD TEXT,
           ROL INTEGER
         )
@@ -35,7 +35,7 @@ export class SQliteService {
       await this.dbInstance.executeSql(`
         CREATE TABLE IF NOT EXISTS PRODUCTS (
           IDPRODUCT INTEGER PRIMARY KEY,
-          PRODUCTNAME TEXT,
+          PRODUCTNAME TEXT UNIQUE,
           PRICE INTEGER,
           STOCK INTEGER,
           ACTIVE INT,
@@ -47,6 +47,44 @@ export class SQliteService {
       console.error('Error creating database', error);
     }
   }
+
+  async updateUserTable() {
+    try {
+      this.dbInstance = await this.sqlite.create({
+        name: 'comanda.db',
+        location: 'default'
+      });
+      // Renombrar la tabla original
+      await this.dbInstance.executeSql(`ALTER TABLE USER RENAME TO USER_OLD;`, []);
+
+      // Crear la nueva tabla con restricciones UNIQUE
+      await this.dbInstance.executeSql(`
+        CREATE TABLE IF NOT EXISTS USER (
+          IDUSER TEXT PRIMARY KEY,
+          USERNAME TEXT UNIQUE,
+          FULLNAME TEXT,
+          EMAIL TEXT UNIQUE,
+          PASSWORD TEXT,
+          ROL INTEGER
+        );
+      `, []);
+
+      // Copiar los datos de la tabla antigua a la nueva
+      await this.dbInstance.executeSql(`
+        INSERT INTO USER (IDUSER, USERNAME, FULLNAME, EMAIL, PASSWORD, ROL)
+        SELECT IDUSER, USERNAME, FULLNAME, EMAIL, PASSWORD, ROL
+        FROM USER_OLD;
+      `, []);
+
+      // Eliminar la tabla antigua (opcional)
+      await this.dbInstance.executeSql(`DROP TABLE USER_OLD;`, []);
+
+      console.log('Tabla USER actualizada exitosamente.');
+    } catch (error) {
+      console.error('Error al actualizar la tabla USER:', error);
+    }
+  }
+  
 
   async addUser(user: User): Promise<number> {
     //const salt = await bcrypt.genSalt(10);
@@ -62,6 +100,19 @@ export class SQliteService {
     }
   }
 
+  async delUser(userName: string): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `DELETE FROM USER WHERE USERNAME = ?`;
+      const values = [userName];
+      const res = await this.dbInstance.executeSql(sql, values);
+      
+      return res.rowsAffected;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+  
+
   async getUserByuserName(username: string): Promise<User | null> {
     if (this.dbInstance) {
       const sql = `SELECT * FROM USER WHERE USERNAME = ?`;
@@ -70,7 +121,7 @@ export class SQliteService {
       if (res.rows.length > 0) {
         const user = res.rows.item(0);
         return {
-          id: user.ID,
+          id: user.IDUSER,
           userName: user.USERNAME,
           fullName: user.FULLNAME,
           email: user.EMAIL,
@@ -94,11 +145,18 @@ export class SQliteService {
       try {
         const res = await this.dbInstance.executeSql(sql, values);  // Ejecutar la consulta con valores
         
-        if (res.rows.length > 0) {
-          const users = [];
+        if (res && res.rows && res.rows.length > 0){
+          const users : User[] = [];
           for (let i = 0; i < res.rows.length; i++) {
-            users.push(res.rows.item(i));  // Acceder a cada fila del resultado
-            console.log('ID:', res.id);
+            const user = res.rows.item(i)
+            users.push({
+              id: user.IDUSER,
+              userName: user.USERNAME,
+              fullName: user.FULLNAME,
+              email: user.EMAIL,
+              password: user.PASSWORD,
+              rol: user.ROL
+            });
           }
           return users;  // Devolver los usuarios encontrados
         } else {

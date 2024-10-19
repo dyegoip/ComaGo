@@ -5,6 +5,7 @@ import { AlertController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 import { User } from '../user/user.page';
 import { SQliteService } from '../services/sqlite.service';
+import { Observable } from 'rxjs';
 
 
 @Component({
@@ -57,7 +58,6 @@ export class AddUserPage implements OnInit {
     this.apiService.getUsers().subscribe(
       (data: User[]) => {
         this.users = data;
-        this.generateNextId();
       },
       (error) => {
         console.error('Error al traer los usuarios:', error);
@@ -77,46 +77,49 @@ export class AddUserPage implements OnInit {
   async onSaveUser() {
     if (this.userForm.valid) {
       const newUser = this.userForm.value;
-      newUser.id = this.nextId;
 
-      await this.sqliteService.addUser(newUser);
+      await this.apiService.checkApiConnection().subscribe( isConect => {
+      
+        if(!isConect)
+        {
+          this.sqliteService.addUser(newUser);
+        }else{
+          this.apiService.addUser(newUser).subscribe(async response => {
+            console.log('Usuario añadido exitosamente', response);
 
-      this.apiService.addUser(newUser).subscribe(async response => {
-        console.log('Usuario añadido exitosamente', response);
+            const alert = await this.alertController.create({
+              header: 'Usuario Creado',
+              message: 'El Usuario ' + newUser.fullName + ' ha sido creado con éxito.',
+              buttons: [
+                {
+                  text: 'Aceptar',
+                  handler: () => {
+                    this.router.navigate(['/add-user']).then(() => {
+                      window.location.reload();
+                    });
+                  }
+                }
+              ],
+            });
 
-        // Crear y mostrar el alert
-        const alert = await this.alertController.create({
-          header: 'Usuario Creado',
-          message: 'El Usuario ' + newUser.fullName + ' ha sido creado con éxito.',
-          buttons: [
-            {
-              text: 'Aceptar',
-              handler: () => {
-                this.router.navigate(['/add-user']).then(() => {
-                  window.location.reload();
-                });
-              }
-            }
-          ],
-        });
+            await alert.present();
 
-        await alert.present();
-
-      }, async error => {
-        console.error('Error al añadir el usuario', error);
-        const alert = await this.alertController.create({
-          header: 'Error de Usuario',
-          message: 'Error al añadir el usuario ' +  error,
-          buttons: [
-            {
-              text: 'Aceptar',
-              handler: () => {
-              }
-            }
-          ],
-        });
+          }, async error => {
+            console.error('Error al añadir el usuario', error);
+            const alert = await this.alertController.create({
+              header: 'Error de Usuario',
+              message: 'Error al añadir el usuario ' +  error,
+              buttons: [
+                {
+                  text: 'Aceptar',
+                  handler: () => {
+                  }
+                }
+              ],
+            });
+          });
+        }
       });
     }
   }
-
 }

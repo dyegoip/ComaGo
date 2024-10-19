@@ -1,7 +1,7 @@
 {
   "products": [
     {
-      "id": "1",
+      "id": 1,
       "productName": "Tallarines",
       "price": "6000",
       "stock": "100",
@@ -9,7 +9,7 @@
       "type": "Guarnicion"
     },
     {
-      "id": "2",
+      "id": 2,
       "productName": "Chorrillana",
       "price": 5600,
       "stock": 10,
@@ -17,7 +17,7 @@
       "type": "Guarnicion"
     },
     {
-      "id": "3",
+      "id": 3,
       "productName": "Coca-cola",
       "price": 1500,
       "stock": 50,
@@ -27,72 +27,17 @@
   ],
   "users": [
     {
-      "id": "3",
+      "id": 2,
       "userName": "sebastian",
       "fullName": "Sebastian Nunez",
       "email": "sa.nunezs@duocuc.cl",
       "password": "123456"
     },
     {
-      "id": "1",
+      "id": 1,
       "userName": "dpenaloza",
       "fullName": "Diego Peñaloza",
       "email": "die.penaloza@duocuc.cl",
-      "password": "123456"
-    },
-    {
-      "id": "4",
-      "userName": "rafu",
-      "fullName": "rafu",
-      "email": "rafu@rafu.cl",
-      "password": "123456"
-    },
-    {
-      "id": "5",
-      "userName": "rafuqui",
-      "fullName": "Rafu Quicihiz",
-      "email": "raquichiz@duoc.cl",
-      "rol": "1",
-      "password": "123456"
-    },
-    {
-      "id": "6",
-      "userName": "dyego",
-      "fullName": "Dyego Pena",
-      "email": "diego@duoc.cl",
-      "rol": "1",
-      "password": "123456"
-    },
-    {
-      "id": "7",
-      "userName": "dyego",
-      "fullName": "dyego pena",
-      "email": "dyego@duoc.cl",
-      "rol": "1",
-      "password": "123456"
-    },
-    {
-      "id": "8",
-      "userName": "dyego",
-      "fullName": "dyego pena",
-      "email": "dyego@duoc.cl",
-      "rol": "1",
-      "password": "123456"
-    },
-    {
-      "id": "9",
-      "userName": "dyego",
-      "fullName": "dyego pena",
-      "email": "dyego@duoc.cl",
-      "rol": "1",
-      "password": "123456"
-    },
-    {
-      "id": "10",
-      "userName": "dyego",
-      "fullName": "dyego pena",
-      "email": "dyego@duoc.cl",
-      "rol": "1",
       "password": "123456"
     }
   ]
