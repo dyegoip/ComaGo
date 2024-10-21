@@ -29,8 +29,9 @@ export class AddUserPage implements OnInit {
 
   ngOnInit() {
     this.initializeDatabase();
-
     this.getUsersFromApi();
+
+    this.apiConnect = this.apiService.getConnectionStatus();
     
     this.userForm = this.formBuilder.group({
       id: ['',[]],
