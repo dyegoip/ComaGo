@@ -52,8 +52,7 @@ export class SQliteService {
           USERNAME TEXT,
           ORDERDATE DATE,
           TOTALPRICE INTEGER,
-          STATUS INTEGER,
-          FOREING KEY (USERNAME) REFERENCES USER(USERNAME)
+          STATUS INTEGER
         )
       `, []);
 
@@ -64,7 +63,6 @@ export class SQliteService {
           ORDERNUM INTERGER,
           QUANTITY INTERGER,
           PRICE INTERGER,
-          FOREING KEY (PRODUCTCODE) REFERENCES PRODUCTS(PRODUCTCODE),
           FOREING KEY (ORDERNUM) REFERENCES ORDER(ORDERNUM)
         )
       `, []);
@@ -202,8 +200,8 @@ export class SQliteService {
   async addOrder(order: Order): Promise<number> {
 
     if (this.dbInstance) {
-      const sql = `INSERT INTO ORDER (ORDERNUM, IDUSER, ORDERDATE, TOTALPRICE, STATUS) VALUES (?, ?, ?, ?, ?)`;
-      const values = [order.orderNum, order.idUser, order.orderDate, order.totalPrice, order.status];
+      const sql = `INSERT INTO ORDER (ORDERNUM, USERNAME, ORDERDATE, TOTALPRICE, STATUS) VALUES (?, ?, ?, ?, ?)`;
+      const values = [order.orderNum, order.userName, order.orderDate, order.totalPrice, order.status];
       const res = await this.dbInstance.executeSql(sql, values);
       return res.insertId;
     } else {
@@ -233,7 +231,7 @@ export class SQliteService {
         return {
           id: order.id,
           orderNum: order.orderNum,
-          idUser: order.idUser,
+          userName: order.userName,
           orderDate: order.orderDate,
           totalPrice: order.totalPrice,
           status: order.status
@@ -242,6 +240,18 @@ export class SQliteService {
       } else {
         return null;  // No se encontró un administrador con ese correo
       }
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async addOrderDetail(order: Order): Promise<number> {
+
+    if (this.dbInstance) {
+      const sql = `INSERT INTO ORDERDETAIL (IDDETAIL, PRODUCTCODE, ORDERNUM, QUANTITY, PRICE) VALUES (?, ?, ?, ?, ?)`;
+      const values = [order.orderNum, order.userName, order.orderDate, order.totalPrice, order.status];
+      const res = await this.dbInstance.executeSql(sql, values);
+      return res.insertId;
     } else {
       throw new Error('Database is not initialized');
     }
