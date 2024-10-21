@@ -27,25 +27,15 @@ export class UserPage implements OnInit {
   findUsers: User[] | null = [];
   searchQuery: string = '';
   find: boolean = false;
+  apiConnect: boolean = false;
   
   constructor(private router: Router, 
               private apiService: ApiService,
               private sqliteService: SQliteService,
               private alertController: AlertController) { }
 
-  ngOnInit() {
-    this.initializeDatabase();
-  }
-
-  async initializeDatabase() {
-    try {
-      // Iniciar la base de datos
-      //await this.sqliteService.initDB();
-      await this.sqliteService.updateUserTable();
-      console.log('Base de datos inicializada correctamente');
-    } catch (error) {
-      console.error('Error al inicializar la base de datos:', error);
-    }
+  async ngOnInit() {
+    this.apiConnect = this.apiService.getConnectionStatus();
   }
 
   onInputChange(event: any) {
@@ -54,9 +44,8 @@ export class UserPage implements OnInit {
 
   async getUserLikebyName() {
     try {
-      const isConect = await this.apiService.checkApiConnection().toPromise();
   
-      if (isConect) {
+      if (this.apiConnect) {
         this.apiService.getUsers().subscribe(
           (data: User[]) => {
             this.allUsers = data.map(user => ({

@@ -18,6 +18,8 @@ export class AddUserPage implements OnInit {
   userForm!: FormGroup;
   users: User[] = [];
   nextId: string = "0";
+  apiConnect: boolean = false;
+  ok: boolean = false;
 
   constructor(private formBuilder: FormBuilder, 
               private apiService: ApiService, 
@@ -110,5 +112,73 @@ export class AddUserPage implements OnInit {
           });
         }
       }
+  }
+
+  async onEditUser() {
+    let msgError =  '';
+    
+    if (this.userForm.valid) {
+      const newUser = this.userForm.value;
+
+      if(this.apiConnect){
+        this.apiService.addUser(newUser).subscribe(async response => {
+          
+          this.ok = true;
+  
+        }, async error => {
+
+          msgError = error;
+          this.ok = false;
+          console.error('Error al crear el usuario en la api. ', msgError);
+        });
+      }else{
+        const createUser = this.sqliteService.addUser(newUser);
+        if(typeof(createUser) == 'number'){
+
+          this.ok = true;
+
+        }else{
+
+          this.ok = false;
+          console.error('Error al crear el usuario en el sqlite. ', msgError);
+        }
+
+      }
+
+      if(this.ok){
+        // Crear y mostrar el alert
+        console.log('Usuario creado exitosamente');
+        const alert = await this.alertController.create({
+          header: 'Usuario Editado',
+          message: 'El Usuario ' + newUser.fullName + ' ha sido creado con éxito.',
+          buttons: [
+            {
+              text: 'Aceptar',
+              handler: () => {
+                this.router.navigate(['/add-user']).then(() => {
+                  window.location.reload();
+                });
+              }
+            }
+          ],
+        });
+        
+        await alert.present();
+
+      }else{
+        console.error('Error al añadir el usuario', msgError);
+          const alert = await this.alertController.create({
+            header: 'Error de Usuario',
+            message: 'Error al añadir el usuario ' +  msgError,
+            buttons: [
+              {
+                text: 'Aceptar',
+                handler: () => {
+                }
+              }
+            ],
+          });
+      }
+    }
   }
 }
