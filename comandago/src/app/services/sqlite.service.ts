@@ -29,7 +29,7 @@ export class SQliteService {
           EMAIL TEXT UNIQUE,
           PASSWORD TEXT,
           ROL INTEGER
-        )
+        );
       `, []);
 
       await this.dbInstance.executeSql(`
@@ -48,51 +48,14 @@ export class SQliteService {
     }
   }
 
-  async updateUserTable() {
-    try {
-      this.dbInstance = await this.sqlite.create({
-        name: 'comanda.db',
-        location: 'default'
-      });
-      // Renombrar la tabla original
-      await this.dbInstance.executeSql(`ALTER TABLE USER RENAME TO USER_OLD;`, []);
-
-      // Crear la nueva tabla con restricciones UNIQUE
-      await this.dbInstance.executeSql(`
-        CREATE TABLE IF NOT EXISTS USER (
-          IDUSER TEXT PRIMARY KEY,
-          USERNAME TEXT UNIQUE,
-          FULLNAME TEXT,
-          EMAIL TEXT UNIQUE,
-          PASSWORD TEXT,
-          ROL INTEGER
-        );
-      `, []);
-
-      // Copiar los datos de la tabla antigua a la nueva
-      await this.dbInstance.executeSql(`
-        INSERT INTO USER (IDUSER, USERNAME, FULLNAME, EMAIL, PASSWORD, ROL)
-        SELECT IDUSER, USERNAME, FULLNAME, EMAIL, PASSWORD, ROL
-        FROM USER_OLD;
-      `, []);
-
-      // Eliminar la tabla antigua (opcional)
-      await this.dbInstance.executeSql(`DROP TABLE USER_OLD;`, []);
-
-      console.log('Tabla USER actualizada exitosamente.');
-    } catch (error) {
-      console.error('Error al actualizar la tabla USER:', error);
-    }
-  }
-  
 
   async addUser(user: User): Promise<number> {
     //const salt = await bcrypt.genSalt(10);
     //user.password = await bcrypt.hash(user.password, salt);
     
     if (this.dbInstance) {
-      const sql = `INSERT INTO USER (IDUSER, USERNAME, FULLNAME, EMAIL, PASSWORD, ROL) VALUES (?, ?, ?, ?, ?, ?)`;
-      const values = [user.id, user.userName, user.fullName, user.email, user.password, user.rol];
+      const sql = `INSERT INTO USER (USERNAME, FULLNAME, EMAIL, PASSWORD, ROL) VALUES (?, ?, ?, ?, ?)`;
+      const values = [user.userName, user.fullName, user.email, user.password, user.rol];
       const res = await this.dbInstance.executeSql(sql, values);
       return res.insertId;
     } else {
@@ -170,5 +133,45 @@ export class SQliteService {
       throw new Error('Database is not initialized');
     }
   }
+
+  async getAllUsers(): Promise<User[]| null> {
+    if (this.dbInstance) {
+      const sql = `SELECT * FROM USER WHERE 1 = ?`;
+      const values = ['1'];
+      
+      try {
+        const res = await this.dbInstance.executeSql(sql, values);
+        console.log('Resultado de la consulta:', res);
+        
+        if (res && res.rows && res.rows.length > 0) {
+          const users: User[] = [];
+          
+          for (let i = 0; i < res.rows.length; i++) {
+            const user = res.rows.item(i);
+            console.log(`Usuario encontrado: ${JSON.stringify(user)}`);
+            
+            users.push({
+              id: user.IDUSER,
+              userName: user.USERNAME,
+              fullName: user.FULLNAME,
+              email: user.EMAIL,
+              password: user.PASSWORD,
+              rol: user.ROL
+            });
+          }
+          return users;  // Devolver los usuarios encontrados
+        } else {
+          console.log('No se encontraron coincidencias.');
+          return null;  // No se encontraron coincidencias
+        }} catch (error) {
+          console.error('Error al ejecutar la consulta:', error);
+          return null;
+        }
+
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+  
   
 }

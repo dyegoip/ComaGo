@@ -23,11 +23,13 @@ export interface User {
 
 export class UserPage implements OnInit {
   allUsers : User[] = [];
+  allUsersSync : User[] = [];
   filteredUsers: User[] = [];
   findUsers: User[] | null = [];
   searchQuery: string = '';
   find: boolean = false;
   apiConnect: boolean = false;
+  logs: string[] = [];
   
   constructor(private router: Router, 
               private apiService: ApiService,
@@ -36,6 +38,10 @@ export class UserPage implements OnInit {
 
   async ngOnInit() {
     this.apiConnect = this.apiService.getConnectionStatus();
+  }
+
+  addLog(message: string) {
+    this.logs.push(message);
   }
 
   onInputChange(event: any) {
@@ -180,6 +186,35 @@ export class UserPage implements OnInit {
   // Navegar a la página para agregar un nuevo usuario
   ToAddUser() {
     this.router.navigate(['/add-user']);
+  }
+
+  async syncUsersWithApi() {
+    try {
+      // Obtener todos los usuarios de la base de datos SQLite
+      const users = await this.sqliteService.getAllUsers();
+      
+      if (users && users.length > 0) {
+        for (const user of users) {
+          try {
+            // Intentar insertar el usuario en la API
+            const response = await this.apiService.addUser(user).toPromise();
+            if (response) {
+              this.addLog(`Usuario ${user.userName} insertado en la API exitosamente`);
+  
+              // Eliminar el usuario de SQLite después de confirmación de inserción en la API
+              await this.sqliteService.delUser(user.userName);
+              this.addLog(`Usuario ${user.userName} eliminado de SQLite exitosamente`);
+            }
+          } catch (error) {
+            this.addLog(`Error al insertar el usuario ${user.userName} en la API: `+ error);
+          }
+        }
+      } else {
+        this.addLog('No se encontraron usuarios en la base de datos SQLite para sincronizar.');
+      }
+    } catch (error) {
+      this.addLog('Error durante la sincronización de usuarios: ' + error);
+    }
   }
 
 }

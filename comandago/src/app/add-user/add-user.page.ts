@@ -28,7 +28,6 @@ export class AddUserPage implements OnInit {
               private router: Router ) { }
 
   ngOnInit() {
-    this.initializeDatabase();
     this.getUsersFromApi();
 
     this.apiConnect = this.apiService.getConnectionStatus();
@@ -67,13 +66,6 @@ export class AddUserPage implements OnInit {
         this.users = [];
       }
     );
-  }
-
-  generateNextId() {
-    if (this.users.length > 0) {
-      const lastUser = this.users.reduce((prev, current) => (prev.id > current.id) ? prev : current);
-      this.nextId = ((+lastUser.id) + 1).toString();
-    }
   }
 
   // Función que se llama cuando el formulario se envía
@@ -115,14 +107,14 @@ export class AddUserPage implements OnInit {
       }
   }
 
-  async onEditUser() {
+  async onSaveUser2() {
     let msgError =  '';
     
     if (this.userForm.valid) {
       const newUser = this.userForm.value;
 
       if(this.apiConnect){
-        this.apiService.addUser(newUser).subscribe(async response => {
+        await this.apiService.addUser(newUser).subscribe(async response => {
           
           this.ok = true;
   
@@ -133,7 +125,7 @@ export class AddUserPage implements OnInit {
           console.error('Error al crear el usuario en la api. ', msgError);
         });
       }else{
-        const createUser = this.sqliteService.addUser(newUser);
+        const createUser = await this.sqliteService.addUser(newUser);
         if(typeof(createUser) == 'number'){
 
           this.ok = true;

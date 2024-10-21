@@ -12,6 +12,10 @@
   <div class="password">
     <ion-button slot="end" id="searchButton" color="success" (click)="ToAddUser()">Añadir Usuario</ion-button>
   </div>
+
+  <div class="password">
+    <ion-button slot="end" id="searchButton" color="warning" (click)="syncUsersWithApi()">Sincronizar</ion-button>
+  </div>
   <!-- Input para buscar usuario -->
   <ion-item>
     <ion-label position="floating">Buscar Usuario</ion-label>
@@ -53,6 +57,14 @@
   <ion-card *ngIf="filteredUsers.length === 0 && find">
     <ion-card-header>
       <ion-card-title>No se encontraron usuarios</ion-card-title>
+    </ion-card-header>
+  </ion-card>
+
+  <ion-card *ngIf="logs.length === 0">
+    <ion-card-header>
+      <div *ngFor="let log of logs">
+        <p>{{ log }}</p>
+      </div>
     </ion-card-header>
   </ion-card>
 
