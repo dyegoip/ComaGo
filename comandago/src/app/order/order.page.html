@@ -7,4 +7,15 @@
   </ion-toolbar>
 </ion-header>
 
-  
+<ion-item>
+  <ion-select label="Seleccione Producto" interface="action-sheet" label-placement="floating" required>
+    <ion-select>
+      <ion-select-option *ngFor="let product of allProducts" [value]="product.id">
+        {{ product.productName }}
+      </ion-select-option>
+    </ion-select>
+  </ion-select>
+</ion-item>
+
+
+<ion-button type="submit" color="primary">Guardar</ion-button>
