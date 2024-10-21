@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError, map, Observable, of, throwError, timeout } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, switchMap, throwError, timeout } from 'rxjs';
 import { User } from '../user/user.page';
 import { Product } from '../product/product.page'
 
@@ -13,6 +13,9 @@ export class ApiService {
   //private apiUrl = 'http://192.168.84.40:3000';
   private apiUrl = 'http://192.168.100.74:3000';
 
+  private apiConnectionStatus = new BehaviorSubject<boolean>(false);
+  connectionStatus$ = this.apiConnectionStatus.asObservable();
+
   constructor(private http: HttpClient) {}
   
   checkApiConnection(): Observable<boolean> {
@@ -21,6 +24,10 @@ export class ApiService {
       map(() => true),
       catchError(() => of(false))
     );
+  }
+
+  getConnectionStatus(): boolean {
+    return this.apiConnectionStatus.getValue();
   }
 
   // Método para realizar una petición GET a la API
@@ -54,9 +61,24 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/users/`, user);
   }
 
-  editUser(user: any): Observable<any> {
+  editUser(user: User): Observable<any> {
     return this.http.put(`${this.apiUrl}/users/${user.id}`, user);
   }
+
+  editUserByUsername(updatedUserData: User): Observable<any> {
+    const userName = updatedUserData.userName;
+    return this.getUserByUserName(userName).pipe(
+      switchMap((user: any) => {
+        if (user != null) {
+          const updatedUser = { ...user, ...updatedUserData };
+          return this.editUser(updatedUser);
+        } else {
+          throw new Error('Usuario no encontrado');
+        }
+      })
+    );
+  }
+
   deleteUser(userId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/users/${userId}`);
   }
