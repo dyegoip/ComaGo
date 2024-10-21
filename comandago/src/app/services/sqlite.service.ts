@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
 import { User } from '../user/user.page';
 import { Product } from '../product/product.page';
+import { Order } from '../order/order.page';
 
 @Injectable({
   providedIn: 'root'
@@ -36,10 +37,33 @@ export class SQliteService {
         CREATE TABLE IF NOT EXISTS PRODUCTS (
           IDPRODUCT INTEGER PRIMARY KEY,
           PRODUCTNAME TEXT UNIQUE,
+          PRODUCTCODE TEXT UNIQUE,
           PRICE INTEGER,
           STOCK INTEGER,
           ACTIVE INT,
           TYPEPRODUCT TEXT
+        )
+      `, []);
+
+      await this.dbInstance.executeSql(`
+        CREATE TABLE IF NOT EXISTS ORDER (
+          IDORDER INTEGER PRIMARY KEY,
+          ORDERNUM INTEGER UNIQUE,
+          USERNAME TEXT,
+          ORDERDATE DATE,
+          TOTALPRICE INTEGER,
+          STATUS INTEGER
+        )
+      `, []);
+
+      await this.dbInstance.executeSql(`
+        CREATE TABLE IF NOT EXISTS ORDERDETAIL (
+          IDDETAIL INTEGER PRIMARY KEY,
+          PRODUCTCODE TEXT,
+          ORDERNUM INTERGER,
+          QUANTITY INTERGER,
+          PRICE INTERGER,
+          FOREING KEY (ORDERNUM) REFERENCES ORDER(ORDERNUM)
         )
       `, []);
 
@@ -174,4 +198,65 @@ export class SQliteService {
   }
   
   
+  // Function Order//
+
+  async addOrder(order: Order): Promise<number> {
+
+    if (this.dbInstance) {
+      const sql = `INSERT INTO ORDER (ORDERNUM, USERNAME, ORDERDATE, TOTALPRICE, STATUS) VALUES (?, ?, ?, ?, ?)`;
+      const values = [order.orderNum, order.userName, order.orderDate, order.totalPrice, order.status];
+      const res = await this.dbInstance.executeSql(sql, values);
+      return res.insertId;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async delOrder(orderNum: number): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `DELETE FROM ORDER WHERE USERNAME = ?`;
+      const values = [orderNum];
+      const res = await this.dbInstance.executeSql(sql, values);
+      
+      return res.rowsAffected;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async getOrderByorderNumber(orderNum: number): Promise<Order | null> {
+    if (this.dbInstance) {
+      const sql = `SELECT * FROM ORDER WHERE USERNAME = ?`;
+      const values = [orderNum];
+      const res = await this.dbInstance.executeSql(sql, values);
+      if (res.rows.length > 0) {
+        const order = res.rows.item(0);
+        return {
+          id: order.id,
+          orderNum: order.orderNum,
+          userName: order.userName,
+          orderDate: order.orderDate,
+          totalPrice: order.totalPrice,
+          status: order.status
+
+        };
+      } else {
+        return null;  // No se encontró un administrador con ese correo
+      }
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async addOrderDetail(order: Order): Promise<number> {
+
+    if (this.dbInstance) {
+      const sql = `INSERT INTO ORDERDETAIL (IDDETAIL, PRODUCTCODE, ORDERNUM, QUANTITY, PRICE) VALUES (?, ?, ?, ?, ?)`;
+      const values = [order.orderNum, order.userName, order.orderDate, order.totalPrice, order.status];
+      const res = await this.dbInstance.executeSql(sql, values);
+      return res.insertId;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
 }
