@@ -35,40 +35,40 @@ export class SQliteService {
 
       await this.dbInstance.executeSql(`
         CREATE TABLE IF NOT EXISTS PRODUCTS (
-          IDPRODUCT INTEGER PRIMARY KEY,
+          IDPRODUCT INT PRIMARY KEY,
           PRODUCTNAME TEXT UNIQUE,
           PRODUCTCODE TEXT UNIQUE,
-          PRICE INTEGER,
-          STOCK INTEGER,
+          PRICE INT,
+          STOCK INT,
           ACTIVE INT,
           TYPEPRODUCT TEXT
         )
       `, []);
 
       await this.dbInstance.executeSql(`
-        CREATE TABLE IF NOT EXISTS ORDER (
-          IDORDER INTEGER PRIMARY KEY,
-          ORDERNUM INTEGER UNIQUE,
+        CREATE TABLE IF NOT EXISTS "ORDER" (
+          IDORDER INT PRIMARY KEY,
+          ORDERNUM INT UNIQUE,
           USERNAME TEXT,
           ORDERDATE DATE,
-          TOTALPRICE INTEGER,
-          STATUS INTEGER
+          TOTALPRICE INT,
+          STATUS INT
         )
       `, []);
 
       await this.dbInstance.executeSql(`
         CREATE TABLE IF NOT EXISTS ORDERDETAIL (
-          IDDETAIL INTEGER PRIMARY KEY,
+          IDDETAIL INT PRIMARY KEY,
           PRODUCTCODE TEXT,
-          ORDERNUM INTERGER,
-          QUANTITY INTERGER,
-          PRICE INTERGER,
-          FOREING KEY (ORDERNUM) REFERENCES ORDER(ORDERNUM)
+          ORDERNUM INT,
+          QUANTITY INT,
+          PRICE INT,
+          FOREIGN KEY (ORDERNUM) REFERENCES "ORDER"(ORDERNUM)
         )
       `, []);
 
     } catch (error) {
-      console.error('Error creating database', error);
+      console.error('Error creating database', JSON.stringify(error));
     }
   }
 
@@ -78,9 +78,10 @@ export class SQliteService {
     //user.password = await bcrypt.hash(user.password, salt);
     
     if (this.dbInstance) {
-      const sql = `INSERT INTO USER (USERNAME, FULLNAME, EMAIL, PASSWORD, ROL) VALUES (?, ?, ?, ?, ?)`;
-      const values = [user.userName, user.fullName, user.email, user.password, user.rol];
+      const sql = `INSERT INTO USER (IDUSER, USERNAME, FULLNAME, EMAIL, PASSWORD, ROL) VALUES (?, ?, ?, ?, ?, ?)`;
+      const values = [user.id, user.userName, user.fullName, user.email, user.password, user.rol];
       const res = await this.dbInstance.executeSql(sql, values);
+      console.log(res.insertId);
       return res.insertId;
     } else {
       throw new Error('Database is not initialized');
@@ -116,7 +117,7 @@ export class SQliteService {
           rol: user.ROL
         };
       } else {
-        return null;  // No se encontró un administrador con ese correo
+        return null;
       }
     } else {
       throw new Error('Database is not initialized');
@@ -125,9 +126,9 @@ export class SQliteService {
 
   async getUserLikeByName(fullname: string): Promise<User[]| null> {
     if (this.dbInstance) {
-      const likeFullname = `%${fullname}%`;  // Añadir comodines para la búsqueda
-      const sql = `SELECT * FROM USER WHERE FULLNAME LIKE ?`;  // Usar cláusula LIKE
-      const values = [likeFullname];  // Valores a pasar para la consulta
+      const likeFullname = `%${fullname}%`;
+      const sql = `SELECT * FROM USER WHERE FULLNAME LIKE ?`;
+      const values = [likeFullname];
       
       try {
         const res = await this.dbInstance.executeSql(sql, values);  // Ejecutar la consulta con valores
@@ -145,12 +146,12 @@ export class SQliteService {
               rol: user.ROL
             });
           }
-          return users;  // Devolver los usuarios encontrados
+          return users;
         } else {
-          return null;  // No se encontraron coincidencias
+          return null;
         }
       } catch (error) {
-        console.error('Error al ejecutar la consulta:', error);
+        console.error('Error al consultar usuarios ', JSON.stringify(error));
         return null;
       }
     } else {
@@ -160,20 +161,18 @@ export class SQliteService {
 
   async getAllUsers(): Promise<User[]| null> {
     if (this.dbInstance) {
-      const sql = `SELECT * FROM USER WHERE 1 = ?`;
-      const values = ['1'];
+      const likeFullname = `%%`;
+      const sql = `SELECT * FROM USER WHERE FULLNAME LIKE ?`;
+      const values = [likeFullname];
       
       try {
         const res = await this.dbInstance.executeSql(sql, values);
-        console.log('Resultado de la consulta:', res);
         
-        if (res && res.rows && res.rows.length > 0) {
-          const users: User[] = [];
-          
+        if (res && res.rows && res.rows.length > 0){
+          const users : User[] = [];
           for (let i = 0; i < res.rows.length; i++) {
             const user = res.rows.item(i);
-            console.log(`Usuario encontrado: ${JSON.stringify(user)}`);
-            
+            console.log(user.IDUSER);
             users.push({
               id: user.IDUSER,
               userName: user.USERNAME,
@@ -183,15 +182,14 @@ export class SQliteService {
               rol: user.ROL
             });
           }
-          return users;  // Devolver los usuarios encontrados
+          return users;
         } else {
-          console.log('No se encontraron coincidencias.');
-          return null;  // No se encontraron coincidencias
-        }} catch (error) {
-          console.error('Error al ejecutar la consulta:', error);
           return null;
         }
-
+      } catch (error) {
+        console.error('Error al consultar todos los usuarios ', JSON.stringify(error));
+        return null;
+      }
     } else {
       throw new Error('Database is not initialized');
     }
@@ -214,7 +212,7 @@ export class SQliteService {
 
   async delOrder(orderNum: number): Promise<number> {
     if (this.dbInstance) {
-      const sql = `DELETE FROM ORDER WHERE USERNAME = ?`;
+      const sql = `DELETE FROM ORDER WHERE ORDERNUM = ?`;
       const values = [orderNum];
       const res = await this.dbInstance.executeSql(sql, values);
       

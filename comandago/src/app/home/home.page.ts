@@ -71,11 +71,11 @@ export class HomePage implements OnInit {
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
-      resultType: CameraResultType.Base64,  // Puedes usar 'Uri' si prefieres una URL de archivo.
-      source: CameraSource.Camera           // Para elegir entre cámara o galería.
+      resultType: CameraResultType.Base64,
+      source: CameraSource.Camera
     });
 
-    this.image = `data:image/jpeg;base64,${image.base64String}`;  // Puedes mostrar esta imagen en el HTML
+    this.image = `data:image/jpeg;base64,${image.base64String}`; 
   }
 
   

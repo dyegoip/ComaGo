@@ -1,5 +1,5 @@
 import { ApiService } from './services/api.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuController, NavController } from '@ionic/angular';
 import { SQliteService } from './services/sqlite.service';
@@ -45,6 +45,12 @@ export class AppComponent implements OnInit{
   checkAuthentication() {
     const authStatus = sessionStorage.getItem('isAuthenticated');
     this.isAuthenticated = authStatus === 'true';
+  }
+
+  getRandomID(): number {
+    const idRamdon: number = Math.floor(10000 + (Math.random() * 9000));
+    console.log("getRandomId : " + idRamdon);
+    return idRamdon;
   }
 
   navigateToHome() {

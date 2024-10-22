@@ -31,6 +31,7 @@
       "userName": "sebastian",
       "fullName": "Sebastian Nunez",
       "email": "sa.nunezs@duocuc.cl",
+      "rol": 1,
       "password": "123456"
     },
     {
@@ -38,7 +39,24 @@
       "userName": "dpenaloza",
       "fullName": "Diego Peñaloza",
       "email": "die.penaloza@duocuc.cl",
+      "rol": 1,
       "password": "123456"
+    },
+    {
+      "id": null,
+      "userName": "rafu",
+      "fullName": "Rafu Quichiz",
+      "email": "rafu@duoc.cl",
+      "password": "123456",
+      "rol": 1
+    },
+    {
+      "id": null,
+      "userName": "sergio",
+      "fullName": "Sergio Fuentes",
+      "email": "sergio@duoc.cl",
+      "password": "123456",
+      "rol": 1
     }
   ]
 }

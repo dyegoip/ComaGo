@@ -1,5 +1,5 @@
 import { ApiService } from './../services/api.service';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { SQliteService } from '../services/sqlite.service';
@@ -29,19 +29,22 @@ export class UserPage implements OnInit {
   searchQuery: string = '';
   find: boolean = false;
   apiConnect: boolean = false;
-  logs: string[] = [];
+  logMessages: string[] = [];
+  userApi: any = null;
   
   constructor(private router: Router, 
               private apiService: ApiService,
               private sqliteService: SQliteService,
-              private alertController: AlertController) { }
+              private alertController: AlertController,
+              private changeDetector: ChangeDetectorRef) { }
 
   async ngOnInit() {
     this.apiConnect = this.apiService.getConnectionStatus();
   }
 
   addLog(message: string) {
-    this.logs.push(message);
+    this.logMessages.push(message);
+    this.changeDetector.detectChanges()
   }
 
   onInputChange(event: any) {
@@ -145,34 +148,38 @@ export class UserPage implements OnInit {
   async deleteUserApi(userDelete: User) {
     try {
       const userNameDel = userDelete.userName.toString();
-      const isConect = await this.apiService.checkApiConnection().toPromise(); // Convertir el observable a promesa
-  
-      if (!isConect) {
-        // Eliminar localmente usando SQLite
-        await this.sqliteService.delUser(userNameDel);
-        console.log('Usuario eliminado localmente');
-      } else {
-        // Eliminar usuario de la API
-        const response = await this.apiService.deleteUser(userDelete.id.toString()).toPromise();
-        console.log('Usuario eliminado exitosamente', response);
-  
-        // Mostrar alerta de confirmación
-        const alert = await this.alertController.create({
-          header: 'Eliminar Usuario',
-          message: `Usuario ${userDelete.fullName} eliminado éxitosamente`,
-          buttons: [
-            {
-              text: 'Cerrar',
-              role: 'confirm',
-              handler: () => {
-                this.getUserLikebyName(); // Actualizar la lista de usuarios
-              }
-            }
-          ]
-        });
-  
-        await alert.present();
-      }
+
+      this.apiService.getUserByUserName(userDelete.userName).subscribe(
+        async (data: any) => {
+          if (data.length > 0) {
+            this.userApi = data[0];
+            const userId = this.userApi.id;
+          } else {
+            const alert = await this.alertController.create({
+              header: 'Usuario no Existe',
+              message: 'El usuario a eliminar no existe',
+              buttons: ['Aceptar'],
+            });
+            await alert.present();
+          }
+        },
+        async (error) => {
+          const errorMessage = error.message;
+          console.error('Error al conectar con la API: ', error); // Registra el error completo en la consola para depuración
+
+          const alert = await this.alertController.create({
+            header: 'Error de conexión',
+            message: errorMessage, // Usar mensaje específico si está disponible
+            buttons: ['Aceptar'],
+          });
+          await alert.present();
+        }
+      );
+
+      // Eliminar usuario de la API
+      const response = await this.apiService.deleteUser(this.userApi.id).toPromise();
+      console.log('Usuario eliminado exitosamente', response); 
+
     } catch (error) {
       console.error('Error al eliminar el usuario', error);
     }
@@ -190,7 +197,6 @@ export class UserPage implements OnInit {
 
   async syncUsersWithApi() {
     try {
-      // Obtener todos los usuarios de la base de datos SQLite
       const users = await this.sqliteService.getAllUsers();
       
       if (users && users.length > 0) {
@@ -199,14 +205,14 @@ export class UserPage implements OnInit {
             // Intentar insertar el usuario en la API
             const response = await this.apiService.addUser(user).toPromise();
             if (response) {
-              this.addLog(`Usuario ${user.userName} insertado en la API exitosamente`);
-  
+              this.addLog(`Usuario ${user.userName} - ${user.id} insertado en la API exitosamente`);
+
               // Eliminar el usuario de SQLite después de confirmación de inserción en la API
               await this.sqliteService.delUser(user.userName);
-              this.addLog(`Usuario ${user.userName} eliminado de SQLite exitosamente`);
+              this.addLog(`Usuario ${user.userName} - ${user.id} eliminado de SQLite exitosamente`);
             }
           } catch (error) {
-            this.addLog(`Error al insertar el usuario ${user.userName} en la API: `+ error);
+            this.addLog(`Error al insertar el usuario ${user.userName} - ${user.id} en la API: ` + error);
           }
         }
       } else {
@@ -217,4 +223,7 @@ export class UserPage implements OnInit {
     }
   }
 
+  onDeleteLogs(){
+    this.logMessages = [];
+  }
 }

@@ -33,18 +33,10 @@ export class AddProductPage implements OnInit {
     });
   }
 
-  generateNextId() {
-    if (this.products.length > 0) {
-      const lastProducts = this.products.reduce((prev, current) => (prev.id > current.id) ? prev : current);
-      this.nextId = ((+lastProducts.id) + 1).toString();
-    }
-  }
-
   getProductsFromApi() {
     this.apiService.getProducts().subscribe(
       (data: Product[]) => {
         this.products = data;
-        this.generateNextId();
       },
       (error) => {
         console.error('Error al traer los usuarios:', error);

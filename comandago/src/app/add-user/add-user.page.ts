@@ -1,3 +1,4 @@
+import { AppComponent } from './../app.component';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras, Router } from '@angular/router';
@@ -5,8 +6,7 @@ import { AlertController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 import { User } from '../user/user.page';
 import { SQliteService } from '../services/sqlite.service';
-import { Observable } from 'rxjs';
-
+import { Observable, } from 'rxjs';
 
 @Component({
   selector: 'app-add-user',
@@ -25,7 +25,8 @@ export class AddUserPage implements OnInit {
               private apiService: ApiService, 
               private alertController: AlertController,
               private sqliteService: SQliteService,
-              private router: Router ) { }
+              private router: Router,
+              private appComponent: AppComponent) { }
 
   ngOnInit() {
     this.getUsersFromApi();
@@ -33,7 +34,7 @@ export class AddUserPage implements OnInit {
     this.apiConnect = this.apiService.getConnectionStatus();
     
     this.userForm = this.formBuilder.group({
-      id: ['',[]],
+      id: ['', [Validators.required]],
       userName: ['', [Validators.required]],
       fullName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
@@ -72,6 +73,8 @@ export class AddUserPage implements OnInit {
   async onSaveUser() {
     if (this.userForm.valid) {
       const newUser = this.userForm.value;
+      newUser.id = await this.appComponent.getRandomID();
+      await console.log("Ramdon ID add : " + newUser.id);
         const createUser = this.sqliteService.addUser(newUser);
         if(typeof(createUser) == 'number'){
           const alert = await this.alertController.create({

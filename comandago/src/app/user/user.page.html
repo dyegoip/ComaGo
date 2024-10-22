@@ -60,10 +60,13 @@
     </ion-card-header>
   </ion-card>
 
-  <ion-card *ngIf="logs.length === 0">
+  <ion-card *ngIf="logMessages.length > 0">
     <ion-card-header>
-      <div *ngFor="let log of logs">
+      <div *ngFor="let log of logMessages">
         <p>{{ log }}</p>
+      </div>
+      <div class="password">
+        <ion-button color="danger" (click)="onDeleteLogs()">Borrar Log</ion-button>
       </div>
     </ion-card-header>
   </ion-card>
