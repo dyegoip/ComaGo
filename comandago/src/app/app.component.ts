@@ -48,8 +48,7 @@ export class AppComponent implements OnInit{
   }
 
   getRandomID(): number {
-    const idRamdon: number = Math.floor(10000 + (Math.random() * 9000));
-    console.log("getRandomId : " + idRamdon);
+    const idRamdon: number = Math.floor(100000 + (Math.random() * 90000));
     return idRamdon;
   }
 

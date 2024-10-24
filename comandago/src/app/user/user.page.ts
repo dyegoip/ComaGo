@@ -5,7 +5,7 @@ import { AlertController } from '@ionic/angular';
 import { SQliteService } from '../services/sqlite.service';
 
 export interface User {
-  id: number;
+  id: string;
   userName: string;
   fullName: string;
   email: string;

@@ -81,7 +81,7 @@ export class SQliteService {
       const sql = `INSERT INTO USER (IDUSER, USERNAME, FULLNAME, EMAIL, PASSWORD, ROL) VALUES (?, ?, ?, ?, ?, ?)`;
       const values = [user.id, user.userName, user.fullName, user.email, user.password, user.rol];
       const res = await this.dbInstance.executeSql(sql, values);
-      console.log(res.insertId);
+      console.log(JSON.stringify(res));
       return res.insertId;
     } else {
       throw new Error('Database is not initialized');

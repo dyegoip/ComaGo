@@ -35,6 +35,8 @@ export class EditUserPage implements OnInit {
     const navigation = this.router.getCurrentNavigation();
     if (navigation && navigation.extras.state && navigation.extras.state['userEdit'] != null) {
       const userEdit = navigation.extras.state['userEdit'];
+
+      console.log(userEdit.id);
       
       this.userForm.patchValue({
         id: userEdit.id,

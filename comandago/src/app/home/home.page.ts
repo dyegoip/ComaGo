@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { IonicModule, MenuController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-home',
@@ -23,8 +24,13 @@ export class HomePage implements OnInit {
   userAuth!: User;
   newUser!: User;
   public image: string = "";
+  random: number = 0;
 
-  constructor(private router: Router, private apiService: ApiService, private menu: MenuController, private sqliteService: SQliteService, ) {}
+  constructor(private router: Router, 
+              private apiService: ApiService, 
+              private menu: MenuController, 
+              private sqliteService: SQliteService, 
+              private appComponent: AppComponent) {}
 
   ngOnInit() {
 
@@ -76,6 +82,10 @@ export class HomePage implements OnInit {
     });
 
     this.image = `data:image/jpeg;base64,${image.base64String}`; 
+  }
+
+  async getRamdon() {
+    this.random = await this.appComponent.getRandomID();
   }
 
   
