@@ -14,7 +14,6 @@ export class EditUserPage implements OnInit {
 
   userForm!: FormGroup;
   apiConnect: boolean = false;
-  okApi: boolean = false;
   
   constructor(private formBuilder: FormBuilder, 
               private apiService: ApiService,
@@ -43,104 +42,68 @@ export class EditUserPage implements OnInit {
         userName: userEdit.userName,
         fullName: userEdit.fullName,
         email: userEdit.email,
+        rol: userEdit.rol.toString(),
         password: userEdit.password
       });
     } else {
       console.log('No hay usuario');
     }
 
-    this.apiConnect = this.apiService.getConnectionStatus();
+    this.apiService.checkApiConnection().subscribe(status => {
+      this.apiConnect = status; // Actualiza el estado de conexión
+      console.log('Estado de conexión a la API:', this.apiConnect);
+    });
   }
 
   async onEditUser() {
-    let msgError =  '';
-    
-    if (this.userForm.valid) {
-      const newUser = this.userForm.value;
-
-      if(this.apiConnect){
-        this.apiService.editUserByUsername(newUser).subscribe(async response => {
-          
-          this.okApi = true;
+    let msgError = '';
   
-        }, async error => {
-
-          msgError = error;
-          this.okApi = false;
-
-        });
-      }else{
-        const createUser = this.sqliteService.addUser(newUser);
-        if(typeof(createUser) == 'number'){
+    if (this.userForm.valid) {
+      const editUser = this.userForm.value;
+  
+      if (this.apiConnect) {
+        try {
+          const response = await this.apiService.editUser(editUser).toPromise();
+  
+          // Mostrar alerta de éxito
           const alert = await this.alertController.create({
             header: 'Usuario Editado',
-            message: 'El Usuario ' + newUser.fullName + ' ha sido editado.',
+            message: 'El Usuario ' + editUser.fullName + ' ha sido editado con éxito.',
             buttons: [
               {
                 text: 'Aceptar',
                 handler: () => {
-                  this.router.navigate(['/add-user']).then(() => {
+                  this.router.navigate(['/user']).then(() => {
                     window.location.reload();
                   });
                 }
               }
             ],
           });
-
           await alert.present();
-        }else{
-          console.error('Error al editar el usuario', createUser);
+  
+        } catch (error) {
+          const err = error as { message?: string };
+          msgError = err.message || 'Ocurrió un error al editar el usuario.';
+  
+          // Mostrar alerta de error
+          console.error('Error al editar el usuario', msgError);
           const alert = await this.alertController.create({
             header: 'Error de Usuario',
-            message: 'Error al editar el usuario ' +  newUser.fullName,
+            message: 'Error al editar el usuario ' + editUser.fullName + ': ' + msgError,
             buttons: [
               {
                 text: 'Aceptar',
-                handler: () => {
-                }
+                handler: () => {}
               }
             ],
           });
+          await alert.present();
         }
-
-      }
-
-      if(this.okApi){
-        // Crear y mostrar el alert
-        console.log('Usuario Editado exitosamente');
-        const alert = await this.alertController.create({
-          header: 'Usuario Editado',
-          message: 'El Usuario ' + newUser.fullName + ' ha sido editado con éxito.',
-          buttons: [
-            {
-              text: 'Aceptar',
-              handler: () => {
-                this.router.navigate(['/add-user']).then(() => {
-                  window.location.reload();
-                });
-              }
-            }
-          ],
-        });
-        
-        await alert.present();
-
-      }else{
-        console.error('Error al añadir el usuario', msgError);
-          const alert = await this.alertController.create({
-            header: 'Error de Usuario',
-            message: 'Error al añadir el usuario ' +  msgError,
-            buttons: [
-              {
-                text: 'Aceptar',
-                handler: () => {
-                }
-              }
-            ],
-          });
       }
     }
   }
+  
 
   navigateToUser() {
     this.router.navigate(['/user']);

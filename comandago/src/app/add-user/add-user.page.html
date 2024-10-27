@@ -22,10 +22,15 @@
         <ion-label position="floating">Correo Electrónico</ion-label>
         <ion-input type="email" formControlName="email" required></ion-input>
       </ion-item>
-      <ion-item>
-        <ion-label position="floating">Rol</ion-label>
-        <ion-input formControlName="rol" required></ion-input>
-      </ion-item>
+      <ion-list>
+        <ion-item>
+          <ion-select formControlName="rol" label="Rol" interface="action-sheet" label-placement="floating" required>
+            <ion-select-option value="1">Administrador</ion-select-option>
+            <ion-select-option value="2">Garzon</ion-select-option>
+            <ion-select-option value="3">Cocinero</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
       <ion-item>
         <ion-label position="floating">Contraseña</ion-label>
         <ion-input type="password" formControlName="password" required></ion-input>

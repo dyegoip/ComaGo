@@ -3,6 +3,7 @@ import { Component, ElementRef, OnInit, ViewChild, ChangeDetectorRef } from '@an
 import { NavigationExtras, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { SQliteService } from '../services/sqlite.service';
+import { empty } from 'rxjs';
 
 export interface User {
   id: string;
@@ -27,19 +28,25 @@ export class UserPage implements OnInit {
   filteredUsers: User[] = [];
   findUsers: User[] | null = [];
   searchQuery: string = '';
-  find: boolean = false;
+  find: boolean = true;
   apiConnect: boolean = false;
   logMessages: string[] = [];
   userApi: any = null;
+  msgScreen: string = 'empty';
   
   constructor(private router: Router, 
               private apiService: ApiService,
               private sqliteService: SQliteService,
               private alertController: AlertController,
-              private changeDetector: ChangeDetectorRef) { }
+              private changeDetector: ChangeDetectorRef) {
+                
+               }
 
   async ngOnInit() {
-    this.apiConnect = this.apiService.getConnectionStatus();
+    this.apiService.checkApiConnection().subscribe(status => {
+      this.apiConnect = status; // Actualiza el estado de conexión
+      console.log('Estado de conexión a la API:', this.apiConnect);
+    });
   }
 
   addLog(message: string) {
@@ -53,7 +60,7 @@ export class UserPage implements OnInit {
 
   async getUserLikebyName() {
     try {
-  
+      console.log(this.apiConnect)
       if (this.apiConnect) {
         this.apiService.getUsers().subscribe(
           (data: User[]) => {
@@ -72,26 +79,27 @@ export class UserPage implements OnInit {
               );
             }
             this.find = this.filteredUsers.length > 0;
+
+            if(this.filteredUsers.length === 0 && !this.find){
+              this.msgScreen = `No se encontraron usuario con la búsqueda ${this.searchQuery}`;
+            }
           },
           (error) => {
             console.error('Error al traer los usuarios desde la API:', error);
+            this.find = false;
+            this.msgScreen = 'Error al traer los usuarios desde la API:' + error;
             this.allUsers = [];
             this.filteredUsers = [];
           }
         );
       } else {
-        const localUsers = await this.sqliteService.getUserLikeByName(this.searchQuery);
-  
-        if (localUsers) {
-          this.filteredUsers = localUsers;
-          this.find = localUsers.length > 0;
-        } else {
-          this.filteredUsers = [];
-          this.find = false;
-        }
+        this.msgScreen = 'No hay conexión con el servidor';
+        this.find = false;
       }
     } catch (error) {
       console.error('Error verificando la conexión o trayendo los datos:', error);
+      this.msgScreen = 'Error verificando la conexión o trayendo los datos' + error;
+      this.find = false;
       this.allUsers = [];
       this.filteredUsers = [];
     }

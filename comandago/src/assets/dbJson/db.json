@@ -1,38 +1,57 @@
 {
+    "users": [
+    {
+      "id": "100001",
+      "userName": "dpenaloza",
+      "fullName": "Diego Peñaloza",
+      "email": "die.penaloza@duocuc.cl",
+      "rol": 1,
+      "password": "123456"
+    },
+    {
+      "id": "126540",
+      "userName": "seba",
+      "fullName": "Sebastian",
+      "email": "seba@duoc.cl",
+      "rol": "1",
+      "password": "123456"
+    },
+    {
+      "id": "168296",
+      "userName": "sfuentes",
+      "fullName": "sfuentes",
+      "email": "lsfuentes@sfuentes.cl",
+      "rol": "3",
+      "password": "1234567"
+    }
+  ],
   "products": [
     {
-      "id": 1,
+      "id": "1",
       "productName": "Tallarines",
+      "productCode": "",
       "price": "6000",
       "stock": "100",
       "active": "false",
       "type": "Guarnicion"
     },
     {
-      "id": 2,
+      "id": "2",
       "productName": "Chorrillana",
+      "productCode": "",
       "price": 5600,
       "stock": 10,
       "active": "false",
       "type": "Guarnicion"
     },
     {
-      "id": 3,
+      "id": "3",
       "productName": "Coca-cola",
+      "productCode": "",
       "price": 1500,
       "stock": 50,
       "active": "false",
       "type": "Liquidos"
-    }
-  ],
-  "users": [
-    {
-      "id": "1000001",
-      "userName": "dpenaloza",
-      "fullName": "Diego Peñaloza",
-      "email": "die.penaloza@duocuc.cl",
-      "rol": 1,
-      "password": "123456"
     }
   ]
 }

@@ -9,18 +9,22 @@ import { Product } from '../product/product.page'
 })
 export class ApiService {
   //private apiUrl = 'http://localhost:3000';
-  //private apiUrl = 'http://192.168.1.93:3000';
-  private apiUrl = 'http://192.168.84.40:3000';
+  private apiUrl = 'http://192.168.1.93:3000';
+  //private apiUrl = 'http://192.168.84.40:3000';
   //private apiUrl = 'http://192.168.100.74:3000';
 
   private apiConnectionStatus = new BehaviorSubject<boolean>(false);
   connectionStatus$ = this.apiConnectionStatus.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.checkApiConnection().subscribe(status => {
+      this.apiConnectionStatus.next(status);
+    });
+  }
   
   checkApiConnection(): Observable<boolean> {
     return this.http.get(`${this.apiUrl}/users`).pipe(
-      timeout(2500),
+      timeout(3000),
       map(() => true),
       catchError(() => of(false))
     );
