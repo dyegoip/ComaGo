@@ -4,7 +4,7 @@ import { ApiService } from './../services/api.service';
 import { AlertController } from '@ionic/angular';
 
 export interface Product {
-  id: number;
+  id: string;
   productName: string;
   price: number;
   stock: number;

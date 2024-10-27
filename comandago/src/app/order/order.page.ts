@@ -6,7 +6,7 @@ import { SQliteService } from '../services/sqlite.service';
 import { Router } from '@angular/router';
 
 export interface Order {
-  id: number;
+  id: string;
   orderNum: number;
   userName: string;
   orderDate: string;
@@ -34,7 +34,7 @@ export class OrderPage implements OnInit {
   searchQuery: string = '';
   find: boolean = false;
   newOrder: Order = {
-    id : 0,
+    id : '',
     orderNum : 0,
     userName : '',
     orderDate : '',
