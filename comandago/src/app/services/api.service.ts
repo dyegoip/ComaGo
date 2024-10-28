@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, catchError, map, Observable, of, switchMap, throwError, timeout } from 'rxjs';
 import { User } from '../user/user.page';
 import { Product } from '../product/product.page'
+import { Order } from '../order/order.page';
+import { Board } from '../board/board.page';
 
 @Injectable({
   providedIn: 'root'
@@ -120,5 +122,57 @@ export class ApiService {
 
   editProduct(product: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/products/${product.id}`, product);
+  }
+
+  //Funciones Pedido(Order)//
+
+  getOrder(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/order`);
+  }
+
+  getOrderById(id: string) {
+    return this.http.get(`${this.apiUrl}/order/${id}`);
+  }
+
+  getOrderByproductName(productName: string) {
+    return this.http.get(`${this.apiUrl}/products/?productName=${productName}`); //POsible modificacion//
+  }
+
+  addOrder(order: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/order/`, order);
+  }
+
+  deleteOrder(orderId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/order/${orderId}`);
+  }
+
+  editOrder(order: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/order/${order.id}`, order);
+  }
+
+  //Funciones Api Mesa//
+
+  getBoard(): Observable<Board[]> {
+    return this.http.get<Board[]>(`${this.apiUrl}/board`);
+  }
+
+  getBoardById(id: string) {
+    return this.http.get(`${this.apiUrl}/board/${id}`);
+  }
+
+  getBoardByboardName(productName: string) {
+    return this.http.get(`${this.apiUrl}/products/?productName=${productName}`); //Posible Modificacion//
+  }
+
+  addBoard(board: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/board/`, board);
+  }
+
+  deleteBoard(boardId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/board/${boardId}`);
+  }
+
+  editBoard(board: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/board/${board.id}`, board);
   }
 }

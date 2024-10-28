@@ -3,6 +3,7 @@ import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
 import { User } from '../user/user.page';
 import { Product } from '../product/product.page';
 import { Order } from '../order/order.page';
+import { Board } from '../board/board.page';
 
 @Injectable({
   providedIn: 'root'
@@ -64,6 +65,15 @@ export class SQliteService {
           QUANTITY INT,
           PRICE INT,
           FOREIGN KEY (ORDERNUM) REFERENCES "ORDER"(ORDERNUM)
+        )
+      `, []);
+
+      await this.dbInstance.executeSql(`
+        CREATE TABLE IF NOT EXISTS BOARD (
+          BOARDID INT,
+          NUMBERBOARD INT,
+          CAPACITY INT,
+          STATUS INT
         )
       `, []);
 
@@ -257,4 +267,52 @@ export class SQliteService {
       throw new Error('Database is not initialized');
     }
   }
+
+  //Funciones Mesa//
+
+  async addBoard(board: Board): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `INSERT INTO BOARD (BOARDID, NUMBERBOARD, CAPACITY, STATUS) VALUES (?, ?, ?, ?)`;
+      const values = [];
+      const res = await this.dbInstance.executeSql(sql, values);
+      return res.insertId;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async delBoard(boardId: number): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `DELETE FROM BOARD WHERE BOARDID = ?`;
+      const values = [];
+      const res = await this.dbInstance.executeSql(sql, values);
+      
+      return res.rowsAffected;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async getBoardByboardNumber(boardNum: number): Promise<Board | null> {
+    if (this.dbInstance) {
+      const sql = `SELECT * FROM BOARD WHERE NUMBERBOARD = ?`;
+      const values = [];
+      const res = await this.dbInstance.executeSql(sql, values);
+      if (res.rows.length > 0) {
+        const order = res.rows.item(0);
+        return {
+          id: board.id,
+          numberBoard: board.numberBoard,
+          capacity: board.capacity,
+          status: board.status
+        };
+
+      } else {
+        return null;  // No se encontró un administrador con ese correo
+      }
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
 }
