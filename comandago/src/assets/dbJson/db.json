@@ -21,6 +21,7 @@
     {
       "id": "1",
       "productName": "Tallarines",
+      "productCode": "PL-001",
       "price": 6500,
       "stock": 10,
       "active": true,
@@ -32,7 +33,7 @@
       "productCode": "PL-002",
       "price": 5600,
       "stock": 10,
-      "active": "false",
+      "active": false,
       "type": "Guarnicion"
     },
     {
@@ -41,7 +42,7 @@
       "productCode": "BE-001",
       "price": 1500,
       "stock": 50,
-      "active": "false",
+      "active": false,
       "type": "Liquidos"
     }
   ],

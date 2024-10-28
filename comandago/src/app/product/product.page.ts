@@ -7,11 +7,11 @@ import { SQliteService } from '../services/sqlite.service';
 export interface Product {
   id: string;
   productName: string;
+  productCode: string;
   price: number;
   stock: number;
   active: boolean;
   type: string;
-  showOptions?: boolean;
 }
 
 @Component({
@@ -57,7 +57,6 @@ export class ProductPage implements OnInit {
       (data: Product[]) => {
         this.allProducts = data.map(product => ({
           ...product,
-          showOptions: false // Inicializar showOptions en false
         }));
         this.allProducts = data;
         this.filteredProducts = data;  // Al principio, no hay filtro, así que mostramos todos los productos

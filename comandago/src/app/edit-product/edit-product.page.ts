@@ -22,9 +22,10 @@ export class EditProductPage implements OnInit {
     this.productForm = this.formBuilder.group({
       id: ['', []],
       productName: ['', [Validators.required]],
+      productCode: ['', [Validators.required]],
       price: ['', [Validators.required, Validators.min(0)]],
       stock: ['', [Validators.required, Validators.min(0)]],
-      active: [false, []],  // Cambiado para manejar booleano directamente
+      active: [false, []],
       type: ['', [Validators.required]],
     });
   
@@ -35,9 +36,10 @@ export class EditProductPage implements OnInit {
       this.productForm.patchValue({
         id: productEdit.id,
         productName: productEdit.productName,
+        productCode: productEdit.productCode,
         price: productEdit.price,
         stock: productEdit.stock,
-        active: productEdit.active === 'true', // Convierte el valor a booleano
+        active: productEdit.active, 
         type: productEdit.type
       });
     } else {
@@ -59,7 +61,7 @@ export class EditProductPage implements OnInit {
             {
               text: 'Aceptar',
               handler: () => {
-                this.router.navigate(['/edit-product']).then(() => {
+                this.router.navigate(['/product']).then(() => {
                   window.location.reload();
                 });
               }
@@ -82,7 +84,7 @@ export class EditProductPage implements OnInit {
             }
           ],
         });
-        await alert.present();
+        await alert.present();        
       });
     }
   }

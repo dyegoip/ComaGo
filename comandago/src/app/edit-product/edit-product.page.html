@@ -11,8 +11,8 @@
   <div class="container-father">
     <form [formGroup]="productForm" (ngSubmit)="onEditProduct()">
       <ion-item>
-        <ion-label position="stacked">Código del Producto</ion-label>
-        <ion-text>{{ productForm.get('productCode')?.value }}</ion-text>
+        <ion-label position="floating">Código del Producto</ion-label>
+        <ion-input formControlName="productCode" required></ion-input>
       </ion-item>
       
       <ion-item>
@@ -41,7 +41,7 @@
       
       <ion-item>
         <ion-label position="stacked">Activo</ion-label>
-        <ion-toggle formControlName="active" [checked]="productForm.get('active')?.value === 'true'"></ion-toggle>
+        <ion-toggle formControlName="active" [checked]="productForm.get('active')?.value == true"></ion-toggle>
       </ion-item>
 
       <div class="password" style="margin-top: 10px;">
