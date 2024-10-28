@@ -80,7 +80,6 @@ export class AddUserPage implements OnInit {
     );
   }
 
-
   async onSaveUser() {
     let msgError = '';
     

@@ -154,12 +154,36 @@ export class UserPage implements OnInit {
   async deleteUserApi(userDelete: User) {
     try {
       const userNameDel = userDelete.userName.toString();
-
+  
       this.apiService.getUserByUserName(userDelete.userName).subscribe(
         async (data: any) => {
           if (data.length > 0) {
             this.userApi = data[0];
             const userId = this.userApi.id;
+  
+            try {
+              const response = await this.apiService.deleteUser(userId).toPromise();
+              console.log('Usuario eliminado exitosamente', response);
+              
+              const alert = await this.alertController.create({
+                header: 'Usuario Eliminado',
+                message: `El usuario ${userNameDel} ha sido eliminado exitosamente.`,
+                buttons: ['Aceptar'],
+              });
+              await alert.present();
+
+              this.getUserLikebyName();
+  
+            } catch (deleteError) {
+              console.error('Error al eliminar el usuario:', deleteError);
+              const alert = await this.alertController.create({
+                header: 'Error al eliminar',
+                message: `Ocurrió un error al intentar eliminar el usuario ${userNameDel}.`,
+                buttons: ['Aceptar'],
+              });
+              await alert.present();
+            }
+  
           } else {
             const alert = await this.alertController.create({
               header: 'Usuario no Existe',
@@ -170,26 +194,21 @@ export class UserPage implements OnInit {
           }
         },
         async (error) => {
-          const errorMessage = error.message;
-          console.error('Error al conectar con la API: ', error); // Registra el error completo en la consola para depuración
-
+          console.error('Error al conectar con la API:', error);
+  
           const alert = await this.alertController.create({
             header: 'Error de conexión',
-            message: errorMessage, // Usar mensaje específico si está disponible
+            message: error.message || 'Ocurrió un error al conectar con la API',
             buttons: ['Aceptar'],
           });
           await alert.present();
         }
       );
-
-      // Eliminar usuario de la API
-      const response = await this.apiService.deleteUser(this.userApi.id).toPromise();
-      console.log('Usuario eliminado exitosamente', response); 
-
     } catch (error) {
-      console.error('Error al eliminar el usuario', error);
+      console.error('Error al eliminar el usuario:', error);
     }
   }
+  
 
   onViewDetails(user: User) {
     const navigationExtras: NavigationExtras = {

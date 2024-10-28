@@ -71,6 +71,12 @@ const routes: Routes = [
     loadChildren: () => import('./view-user/view-user.module').then( m => m.ViewUserPageModule),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'view-product',
+    loadChildren: () => import('./view-product/view-product.module').then( m => m.ViewProductPageModule),
+    canActivate: [AuthGuard]
+  },
+
 
 ];
 

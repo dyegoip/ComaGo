@@ -273,7 +273,7 @@ export class SQliteService {
   async addBoard(board: Board): Promise<number> {
     if (this.dbInstance) {
       const sql = `INSERT INTO BOARD (BOARDID, NUMBERBOARD, CAPACITY, STATUS) VALUES (?, ?, ?, ?)`;
-      const values = [];
+      const values = [board.id, board.numberBoard, board.capacity, board.status];
       const res = await this.dbInstance.executeSql(sql, values);
       return res.insertId;
     } else {
@@ -284,7 +284,7 @@ export class SQliteService {
   async delBoard(boardId: number): Promise<number> {
     if (this.dbInstance) {
       const sql = `DELETE FROM BOARD WHERE BOARDID = ?`;
-      const values = [];
+      const values = [boardId];
       const res = await this.dbInstance.executeSql(sql, values);
       
       return res.rowsAffected;
@@ -296,10 +296,10 @@ export class SQliteService {
   async getBoardByboardNumber(boardNum: number): Promise<Board | null> {
     if (this.dbInstance) {
       const sql = `SELECT * FROM BOARD WHERE NUMBERBOARD = ?`;
-      const values = [];
+      const values = [boardNum];
       const res = await this.dbInstance.executeSql(sql, values);
       if (res.rows.length > 0) {
-        const order = res.rows.item(0);
+        const board = res.rows.item(0);
         return {
           id: board.id,
           numberBoard: board.numberBoard,
