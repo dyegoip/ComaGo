@@ -52,25 +52,25 @@ const routes: Routes = [
   },
   {
     path: 'edit-user',
-    loadChildren: () => import('./edit-user/edit-user.module').then( m => m.EditUserPageModule)
+    loadChildren: () => import('./edit-user/edit-user.module').then( m => m.EditUserPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'edit-product',
-    loadChildren: () => import('./edit-product/edit-product.module').then( m => m.EditProductPageModule)
+    loadChildren: () => import('./edit-product/edit-product.module').then( m => m.EditProductPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'board',
-    loadChildren: () => import('./board/board.module').then( m => m.BoardPageModule)
+    loadChildren: () => import('./board/board.module').then( m => m.BoardPageModule),
+    canActivate: [AuthGuard]
   },
 
   {
     path: 'view-user',
-    loadChildren: () => import('./view-user/view-user.module').then( m => m.ViewUserPageModule)
+    loadChildren: () => import('./view-user/view-user.module').then( m => m.ViewUserPageModule),
+    canActivate: [AuthGuard]
   },
-
-
-
-
 
 ];
 
