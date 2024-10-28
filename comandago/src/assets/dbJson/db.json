@@ -21,16 +21,15 @@
     {
       "id": "1",
       "productName": "Tallarines",
-      "productCode": "",
-      "price": "6000",
-      "stock": "100",
-      "active": "false",
+      "price": 6500,
+      "stock": 10,
+      "active": true,
       "type": "Guarnicion"
     },
     {
       "id": "2",
       "productName": "Chorrillana",
-      "productCode": "",
+      "productCode": "PL-002",
       "price": 5600,
       "stock": 10,
       "active": "false",
@@ -39,11 +38,40 @@
     {
       "id": "3",
       "productName": "Coca-cola",
-      "productCode": "",
+      "productCode": "BE-001",
       "price": 1500,
       "stock": 50,
       "active": "false",
       "type": "Liquidos"
+    }
+  ],
+  "order": [
+    {
+      "id": "1",
+      "orderNum": 1,
+      "userName": "dpenaloza",
+      "orderDate": "10-10-2024",
+      "totalPrice": 30000,
+      "status": ""
+    }
+  ],
+  "orderdetail": [
+    {
+      "id": "1",
+      "productCode": "PL-001",
+      "orderNum": 1,
+      "quantity": 1,
+      "price": 3000
+    }
+  ],
+  "board": [
+    {
+      "id": "1",
+      "productName": "Tallarines",
+      "price": 5500,
+      "stock": 3,
+      "active": "false",
+      "type": "Guarnicion"
     }
   ]
 }

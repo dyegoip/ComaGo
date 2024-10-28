@@ -26,7 +26,7 @@ export class AddProductPage implements OnInit {
     this.productForm = this.formBuilder.group({
       id: ['', []],
       productName: ['', [Validators.required]],
-      price: ['', [Validators.required, Validators.pattern("^[0-9]*$")]],
+      price: ['', [Validators.required, Validators.min(0)]],
       stock: ['', [Validators.required, Validators.min(0)]],
       active: ['',[]],
       type: ['', [Validators.required]],

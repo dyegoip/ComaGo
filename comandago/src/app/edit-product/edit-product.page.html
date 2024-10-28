@@ -11,30 +11,41 @@
   <div class="container-father">
     <form [formGroup]="productForm" (ngSubmit)="onEditProduct()">
       <ion-item>
+        <ion-label position="stacked">Código del Producto</ion-label>
+        <ion-text>{{ productForm.get('productCode')?.value }}</ion-text>
+      </ion-item>
+      
+      <ion-item>
         <ion-label position="floating">Nombre Producto</ion-label>
         <ion-input formControlName="productName" required></ion-input>
       </ion-item>
+      
       <ion-item>
         <ion-label position="floating">Precio</ion-label>
         <ion-input formControlName="price" type="number" required></ion-input>
       </ion-item>
+      
       <ion-item>
         <ion-label position="floating">Stock</ion-label>
         <ion-input formControlName="stock" type="number" required></ion-input>
       </ion-item>
-      <ion-list>
-        <ion-item>
-          <ion-select formControlName="type" label="Tipo" interface="action-sheet" label-placement="floating" required>
-            <ion-select-option value="Guarnicion">Guarnicion</ion-select-option>
-            <ion-select-option value="Liquidos">Liquidos</ion-select-option>
-            <ion-select-option value="Postre">Postre</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-list>
-      <div class="password">
-        <ion-button id="addButton" type="submit" color="primary" [disabled]="productForm.invalid">Guardar</ion-button>
-      </div>
+      
+      <ion-item>
+        <ion-label position="stacked">Tipo</ion-label>
+        <ion-select formControlName="type" interface="action-sheet" required>
+          <ion-select-option value="Guarnicion">Guarnición</ion-select-option>
+          <ion-select-option value="Liquidos">Líquidos</ion-select-option>
+          <ion-select-option value="Postre">Postre</ion-select-option>
+        </ion-select>
+      </ion-item>
+      
+      <ion-item>
+        <ion-label position="stacked">Activo</ion-label>
+        <ion-toggle formControlName="active" [checked]="productForm.get('active')?.value === 'true'"></ion-toggle>
+      </ion-item>
+
       <div class="password" style="margin-top: 10px;">
+        <ion-button id="addButton" type="submit" color="primary" [disabled]="productForm.invalid">Guardar</ion-button>
         <ion-button id="backButton" color="primary" (click)="navigateToProduct()">Volver</ion-button>
       </div>
     </form>

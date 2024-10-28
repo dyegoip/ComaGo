@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../services/api.service';
 import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
@@ -22,14 +22,13 @@ export class EditProductPage implements OnInit {
     this.productForm = this.formBuilder.group({
       id: ['', []],
       productName: ['', [Validators.required]],
-      price: ['', [Validators.required, Validators.pattern("^[0-9]*$")]],
+      price: ['', [Validators.required, Validators.min(0)]],
       stock: ['', [Validators.required, Validators.min(0)]],
-      active: ['',[]],
+      active: [false, []],  // Cambiado para manejar booleano directamente
       type: ['', [Validators.required]],
     });
   
-
-  const navigation = this.router.getCurrentNavigation();
+    const navigation = this.router.getCurrentNavigation();
     if (navigation && navigation.extras.state && navigation.extras.state['productEdit'] != null) {
       const productEdit = navigation.extras.state['productEdit'];
       console.log(productEdit);
@@ -38,7 +37,7 @@ export class EditProductPage implements OnInit {
         productName: productEdit.productName,
         price: productEdit.price,
         stock: productEdit.stock,
-        active: "false",
+        active: productEdit.active === 'true', // Convierte el valor a booleano
         type: productEdit.type
       });
     } else {
@@ -48,20 +47,19 @@ export class EditProductPage implements OnInit {
 
   async onEditProduct() {
     if (this.productForm.valid) {
-      const newProduct = this.productForm.value;
+      const editProduct = this.productForm.value;
 
-      this.apiService.editProduct(newProduct).subscribe(async response => {
-        console.log('Producto añadido exitosamente', response);
+      this.apiService.editProduct(editProduct).subscribe(async response => {
+        console.log('Producto editado exitosamente', response);
 
-        // Crear y mostrar el alert
         const alert = await this.alertController.create({
           header: 'Producto Editado',
-          message: 'El Producto' + newProduct.productName + ' ha sido editado con éxito.',
+          message: `El producto ${editProduct.productName} ha sido editado con éxito.`,
           buttons: [
             {
               text: 'Aceptar',
               handler: () => {
-                this.router.navigate(['/add-product']).then(() => {
+                this.router.navigate(['/edit-product']).then(() => {
                   window.location.reload();
                 });
               }
@@ -72,10 +70,10 @@ export class EditProductPage implements OnInit {
         await alert.present();
 
       }, async error => {
-        console.error('Error al añadir el producto', error);
+        console.error('Error al editar el producto', error);
         const alert = await this.alertController.create({
           header: 'Error de Producto',
-          message: 'Error al añadir el producto' +  error,
+          message: 'Error al editar el producto: ' + error,
           buttons: [
             {
               text: 'Aceptar',
@@ -84,6 +82,7 @@ export class EditProductPage implements OnInit {
             }
           ],
         });
+        await alert.present();
       });
     }
   }
@@ -91,5 +90,4 @@ export class EditProductPage implements OnInit {
   navigateToProduct() {
     this.router.navigate(['/product']);
   }
-
 }
