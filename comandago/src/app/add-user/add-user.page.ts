@@ -1,6 +1,6 @@
 import { AppComponent } from './../app.component';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { NavigationExtras, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
@@ -173,5 +173,23 @@ export class AddUserPage implements OnInit {
         await alert.present();
       }
     }
-  }  
+  } 
+
+  passwordValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value || '';
+  
+    // Verifica si hay al menos 4 números
+    const hasFourNumbers = (value.match(/\d/g) || []).length >= 4;
+    
+    // Verifica si hay al menos 3 caracteres (cualquier cosa que no sea un espacio en blanco)
+    const hasThreeCharacters = (value.match(/[^\s]/g) || []).length >= 3;
+  
+    // Verifica si hay al menos 1 letra mayúscula
+    const hasUpperCase = /[A-Z]/.test(value);
+  
+    const valid = hasFourNumbers && hasThreeCharacters && hasUpperCase;
+  
+    // Si la contraseña no es válida, devuelve un objeto con el error
+    return !valid ? { passwordInvalid: true } : null;
+  }
 }
