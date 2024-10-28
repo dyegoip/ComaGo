@@ -1,28 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NavigationExtras, Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
-import { Product } from '../product/product.page';
+import { AlertController } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-add-product',
-  templateUrl: './add-product.page.html',
-  styleUrls: ['./add-product.page.scss'],
+  selector: 'app-view-product',
+  templateUrl: './view-product.page.html',
+  styleUrls: ['./view-product.page.scss'],
 })
-export class AddProductPage implements OnInit {
+export class ViewProductPage implements OnInit {
 
   productForm!: FormGroup;
-  products: Product[] = [];
-  nextId: string = "0";
 
   constructor(private formBuilder: FormBuilder, 
               private apiService: ApiService, 
               private alertController: AlertController,
-              private router: Router ) { }
+              private router: Router) { }
 
   ngOnInit() {
-    this.getProductsFromApi();
     this.productForm = this.formBuilder.group({
       id: ['', []],
       productName: ['', [Validators.required]],
@@ -31,33 +27,36 @@ export class AddProductPage implements OnInit {
       active: ['',[]],
       type: ['', [Validators.required]],
     });
+  
+
+  const navigation = this.router.getCurrentNavigation();
+    if (navigation && navigation.extras.state && navigation.extras.state['productEdit'] != null) {
+      const productEdit = navigation.extras.state['productEdit'];
+      console.log(productEdit);
+      this.productForm.patchValue({
+        id: productEdit.id,
+        productName: productEdit.productName,
+        price: productEdit.price,
+        stock: productEdit.stock,
+        active: "false",
+        type: productEdit.type
+      });
+    } else {
+      console.log('No hay producto');
+    }
   }
 
-  getProductsFromApi() {
-    this.apiService.getProducts().subscribe(
-      (data: Product[]) => {
-        this.products = data;
-      },
-      (error) => {
-        console.error('Error al traer los usuarios:', error);
-        this.products = [];
-      }
-    );
-  }
-
-  async onSaveProduct() {
+  async onEditProduct() {
     if (this.productForm.valid) {
       const newProduct = this.productForm.value;
-      newProduct.id = this.nextId;
-      newProduct.active = "false";
 
-      this.apiService.addProduct(newProduct).subscribe(async response => {
+      this.apiService.editProduct(newProduct).subscribe(async response => {
         console.log('Producto añadido exitosamente', response);
 
         // Crear y mostrar el alert
         const alert = await this.alertController.create({
-          header: 'Producto Creado',
-          message: 'El Producto ' + newProduct.productName + ' ha sido creado con éxito.',
+          header: 'Producto Editado',
+          message: 'El Producto' + newProduct.productName + ' ha sido editado con éxito.',
           buttons: [
             {
               text: 'Aceptar',
@@ -76,7 +75,7 @@ export class AddProductPage implements OnInit {
         console.error('Error al añadir el producto', error);
         const alert = await this.alertController.create({
           header: 'Error de Producto',
-          message: 'Error al añadir el product ' +  error,
+          message: 'Error al añadir el producto' +  error,
           buttons: [
             {
               text: 'Aceptar',
@@ -94,4 +93,3 @@ export class AddProductPage implements OnInit {
   }
 
 }
-
