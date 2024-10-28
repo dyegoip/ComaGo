@@ -27,20 +27,18 @@ export class UserPage implements OnInit {
   allUsersSync : User[] = [];
   filteredUsers: User[] = [];
   findUsers: User[] | null = [];
+  userApi: any = null;
   searchQuery: string = '';
   find: boolean = true;
   apiConnect: boolean = false;
   logMessages: string[] = [];
-  userApi: any = null;
   msgScreen: string = 'empty';
   
   constructor(private router: Router, 
               private apiService: ApiService,
               private sqliteService: SQliteService,
               private alertController: AlertController,
-              private changeDetector: ChangeDetectorRef) {
-                
-               }
+              private changeDetector: ChangeDetectorRef) {}
 
   async ngOnInit() {
     this.apiService.checkApiConnection().subscribe(status => {
@@ -194,8 +192,16 @@ export class UserPage implements OnInit {
   }
 
   onViewDetails(user: User) {
-    // Lógica para ver detalles del usuario
-    console.log('Ver detalles de usuario:', user.fullName);
+    const navigationExtras: NavigationExtras = {
+      state: {
+        userEdit: user
+      },
+    }
+    console.log('Ver usuario:', user.fullName);
+
+    this.router.navigate(['/view-user'], navigationExtras).then(() => {
+      window.location.reload();
+    });
   }
 
   // Navegar a la página para agregar un nuevo usuario

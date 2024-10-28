@@ -16,15 +16,15 @@
       </ion-item>
       <ion-item>
         <ion-label position="floating">Precio</ion-label>
-        <ion-input formControlName="price" required></ion-input>
+        <ion-input formControlName="price" type="number" required></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="floating">Stock</ion-label>
-        <ion-input type="email" formControlName="stock" required></ion-input>
+        <ion-input formControlName="stock" type="number" required></ion-input>
       </ion-item>
       <ion-list>
         <ion-item>
-          <ion-select formControlName="type" label="Tipo" interface="action-sheet" label-placement="floating" requiredss>
+          <ion-select formControlName="type" label="Tipo" interface="action-sheet" label-placement="floating" required>
             <ion-select-option value="Guarnicion">Guarnicion</ion-select-option>
             <ion-select-option value="Liquidos">Liquidos</ion-select-option>
             <ion-select-option value="Postre">Postre</ion-select-option>
@@ -34,7 +34,7 @@
       <div class="password">
         <ion-button id="addButton" type="submit" color="primary" [disabled]="productForm.invalid">Guardar</ion-button>
       </div>
-      <div class="password">
+      <div class="password" style="margin-top: 10px;">
         <ion-button id="backButton" color="primary" (click)="navigateToProduct()">Volver</ion-button>
       </div>
     </form>

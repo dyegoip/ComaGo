@@ -89,5 +89,9 @@ export class AddProductPage implements OnInit {
     }
   }
 
+  navigateToProduct() {
+    this.router.navigate(['/product']);
+  }
+
 }
 

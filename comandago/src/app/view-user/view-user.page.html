@@ -1,0 +1,38 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Editar Usuario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="container-father">
+    <form [formGroup]="userForm">
+      <ion-item>
+        <ion-label position="stacked">Nombre de Usuario</ion-label>
+        <ion-text>{{ userForm.get('userName')?.value }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Nombre Completo</ion-label>
+        <ion-text>{{ userForm.get('fullName')?.value }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Correo Electrónico</ion-label>
+        <ion-text>{{ userForm.get('email')?.value }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Rol</ion-label>
+        <ion-text>
+          <ng-container *ngIf="userForm.get('rol')?.value === '1'">Administrador</ng-container>
+          <ng-container *ngIf="userForm.get('rol')?.value === '2'">Garzon</ng-container>
+          <ng-container *ngIf="userForm.get('rol')?.value === '3'">Cocinero</ng-container>
+        </ion-text>
+      </ion-item>
+      <div class="password">
+        <ion-button id="backButton" color="primary" (click)="navigateToUser()">Volver</ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>

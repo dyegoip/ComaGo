@@ -3,14 +3,22 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Producto</ion-title>
+    <ion-title>Gestión de Productos</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div class="password">
-    <ion-button slot="end" id="searchButton" color="success" (click)="ToAddProduct()">Añadir Producto</ion-button>
-  </div>
+
+  <ion-row>
+    <ion-col>
+      <!-- Botón para agregar un nuevo usuario -->
+      <ion-button id="addUserButton" color="success" (click)="ToAddProduct()">Añadir Producto</ion-button>
+    </ion-col>
+    <ion-col class="ion-text-right">
+      <!-- Botón para sincronizar -->
+      <ion-button id="syncButton" color="secondary" (click)="syncUsersWithApi()">Sincronizar</ion-button>
+    </ion-col>
+  </ion-row>
   <ion-card>
     <ion-card-header>
       <ion-card-title>Productos</ion-card-title>

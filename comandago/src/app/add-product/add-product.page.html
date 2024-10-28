@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Añadir producto</ion-title>
+    <ion-title>Añadir Producto</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -31,10 +31,12 @@
           </ion-select>
         </ion-item>
       </ion-list>
-      <div>
-        <ion-button slot="end" id="addButton" type="submit" color="success">Añadir Producto</ion-button>
+      <div class="password">
+        <ion-button id="addButton" type="submit" color="success" [disabled]="productForm.invalid">Guardar</ion-button>
+      </div>
+      <div class="password">
+        <ion-button id="backButton" color="warning" (click)="navigateToProduct()">Volver</ion-button>
       </div>
     </form>
   </div>
-  
 </ion-content>
