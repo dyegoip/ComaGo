@@ -119,6 +119,19 @@ export class ProductPage implements OnInit {
     });
   }
 
+  onViewProductDetails(product: Product) {
+    const navigationExtras: NavigationExtras = {
+      state: {
+        productEdit: product
+      },
+    }
+    console.log('Ver usuario:', product.productName);
+
+    this.router.navigate(['/view-product'], navigationExtras).then(() => {
+      window.location.reload();
+    });
+  }
+
   async onDeleteProduct(product: Product) {
     // Lógica para eliminar usuario
     console.log('Eliminar producto:', product.productName);
@@ -171,11 +184,6 @@ export class ProductPage implements OnInit {
     }
   }
 
-  onViewProductDetails(product: Product) {
-    // Lógica para ver detalles del usuario
-    console.log('Ver detalles de usuario:', product.productName);
-  }
-
   async syncUsersWithApi() {
     try {
       const users = await this.sqliteService.getAllUsers();
@@ -203,5 +211,7 @@ export class ProductPage implements OnInit {
       this.addLog('Error durante la sincronización de usuarios: ' + error);
     }
   }
+
+
 
 }

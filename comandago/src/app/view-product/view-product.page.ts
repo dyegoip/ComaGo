@@ -20,12 +20,12 @@ export class ViewProductPage implements OnInit {
 
   ngOnInit() {
     this.productForm = this.formBuilder.group({
-      id: ['', []],
-      productName: ['', [Validators.required]],
-      price: ['', [Validators.required, Validators.pattern("^[0-9]*$")]],
-      stock: ['', [Validators.required, Validators.min(0)]],
-      active: ['',[]],
-      type: ['', [Validators.required]],
+      id: [{ value: '', disabled: true }, []],
+      productName: [{ value: '', disabled: true }, [Validators.required]],
+      price: [{ value: '', disabled: true },[Validators.required, Validators.pattern("^[0-9]*$")]],
+      stock: [{ value: '', disabled: true }, [Validators.required, Validators.min(0)]],
+      active: [{ value: '', disabled: true },[]],
+      type: [{ value: '', disabled: true }, [Validators.required]],
     });
   
 
@@ -43,48 +43,6 @@ export class ViewProductPage implements OnInit {
       });
     } else {
       console.log('No hay producto');
-    }
-  }
-
-  async onEditProduct() {
-    if (this.productForm.valid) {
-      const newProduct = this.productForm.value;
-
-      this.apiService.editProduct(newProduct).subscribe(async response => {
-        console.log('Producto añadido exitosamente', response);
-
-        // Crear y mostrar el alert
-        const alert = await this.alertController.create({
-          header: 'Producto Editado',
-          message: 'El Producto' + newProduct.productName + ' ha sido editado con éxito.',
-          buttons: [
-            {
-              text: 'Aceptar',
-              handler: () => {
-                this.router.navigate(['/add-product']).then(() => {
-                  window.location.reload();
-                });
-              }
-            }
-          ],
-        });
-
-        await alert.present();
-
-      }, async error => {
-        console.error('Error al añadir el producto', error);
-        const alert = await this.alertController.create({
-          header: 'Error de Producto',
-          message: 'Error al añadir el producto' +  error,
-          buttons: [
-            {
-              text: 'Aceptar',
-              handler: () => {
-              }
-            }
-          ],
-        });
-      });
     }
   }
 

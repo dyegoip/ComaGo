@@ -9,31 +9,27 @@
 
 <ion-content [fullscreen]="true">
   <div class="container-father">
-    <form [formGroup]="productForm" (ngSubmit)="onEditProduct()">
+    <form [formGroup]="productForm">
       <ion-item>
-        <ion-label position="floating">Nombre Producto</ion-label>
-        <ion-input formControlName="productName" required></ion-input>
+        <ion-label position="stacked">Nombre Producto</ion-label>
+        <ion-text>{{ productForm.get('productName')?.value }}</ion-text>
       </ion-item>
       <ion-item>
-        <ion-label position="floating">Precio</ion-label>
-        <ion-input formControlName="price" type="number" required></ion-input>
+        <ion-label position="stacked">Precio</ion-label>
+        <ion-text>{{ productForm.get('price')?.value }}</ion-text>
       </ion-item>
       <ion-item>
-        <ion-label position="floating">Stock</ion-label>
-        <ion-input formControlName="stock" type="number" required></ion-input>
+        <ion-label position="stacked">Stock</ion-label>
+        <ion-text>{{ productForm.get('stock')?.value }}</ion-text>
       </ion-item>
-      <ion-list>
-        <ion-item>
-          <ion-select formControlName="type" label="Tipo" interface="action-sheet" label-placement="floating" required>
-            <ion-select-option value="Guarnicion">Guarnicion</ion-select-option>
-            <ion-select-option value="Liquidos">Liquidos</ion-select-option>
-            <ion-select-option value="Postre">Postre</ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-list>
-      <div class="password">
-        <ion-button id="addButton" type="submit" color="primary" [disabled]="productForm.invalid">Guardar</ion-button>
-      </div>
+      <ion-item>
+        <ion-label position="stacked">Tipo</ion-label>
+        <ion-text>
+          <ng-container *ngIf="productForm.get('type')?.value === 'Guarnicion'">Guarnición</ng-container>
+          <ng-container *ngIf="productForm.get('type')?.value === 'Liquidos'">Líquidos</ng-container>
+          <ng-container *ngIf="productForm.get('type')?.value === 'Postre'">Postre</ng-container>
+        </ion-text>
+      </ion-item>
       <div class="password" style="margin-top: 10px;">
         <ion-button id="backButton" color="primary" (click)="navigateToProduct()">Volver</ion-button>
       </div>
