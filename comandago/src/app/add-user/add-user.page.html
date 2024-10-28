@@ -35,7 +35,7 @@
         <ion-label position="floating">Contraseña</ion-label>
         <ion-input type="password" formControlName="password" required></ion-input>
       </ion-item>
-      <ion-note *ngIf="formularioRegistro.get('password')?.touched && formularioRegistro.get('password')?.hasError('passwordInvalid')" color="danger">
+      <ion-note *ngIf="userForm.get('password')?.touched && userForm.get('password')?.hasError('passwordInvalid')" color="danger">
         La contraseña debe contener <br>
         * Al menos 4 números<br>
         * Al menos 3 caracteres<br>
