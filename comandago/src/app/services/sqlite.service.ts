@@ -299,7 +299,7 @@ export class SQliteService {
       const values = [];
       const res = await this.dbInstance.executeSql(sql, values);
       if (res.rows.length > 0) {
-        const order = res.rows.item(0);
+        const board = res.rows.item(0);
         return {
           id: board.id,
           numberBoard: board.numberBoard,
