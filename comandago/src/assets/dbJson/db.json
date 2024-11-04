@@ -23,6 +23,14 @@
       "stock": 50,
       "active": "false",
       "type": "Liquidos"
+    },
+    {
+      "id": "4",
+      "productName": "Tiramissu",
+      "price": 4500,
+      "stock": 30,
+      "active": "false",
+      "type": "Postre"
     }
   ],
   "users": [
