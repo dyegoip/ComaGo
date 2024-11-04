@@ -23,6 +23,11 @@
         <p>Email: {{ userApi.email }}</p>
       </ion-card-content>
 
+      <ion-button (click)="getRamdon()">Get ID</ion-button>
+      <div *ngIf="random">
+        <p>{{random}}</p>
+      </div>
+
       <ion-button (click)="takePicture()">Capturar Imagen</ion-button>
 
       <div *ngIf="image">

@@ -137,9 +137,6 @@ export class LoginPage implements OnInit {
           return;
         }
 
-        console.log('Nombre de usuario error: ' +  userValue);
-        console.log('Contraseña: ' + passValue);
-
         this.apiService.getUserByUserName(userValue).subscribe(
           async (data: any) => {
             if (data.length > 0) {

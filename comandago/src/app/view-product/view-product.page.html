@@ -1,0 +1,38 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Ver Producto</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="container-father">
+    <form [formGroup]="productForm">
+      <ion-item>
+        <ion-label position="stacked">Nombre Producto</ion-label>
+        <ion-text>{{ productForm.get('productName')?.value }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Precio</ion-label>
+        <ion-text>{{ productForm.get('price')?.value }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Stock</ion-label>
+        <ion-text>{{ productForm.get('stock')?.value }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Tipo</ion-label>
+        <ion-text>
+          <ng-container *ngIf="productForm.get('type')?.value === 'Guarnicion'">Guarnición</ng-container>
+          <ng-container *ngIf="productForm.get('type')?.value === 'Liquidos'">Líquidos</ng-container>
+          <ng-container *ngIf="productForm.get('type')?.value === 'Postre'">Postre</ng-container>
+        </ion-text>
+      </ion-item>
+      <div class="password" style="margin-top: 10px;">
+        <ion-button id="backButton" color="primary" (click)="navigateToProduct()">Volver</ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>

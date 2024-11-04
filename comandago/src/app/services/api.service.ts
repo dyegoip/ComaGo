@@ -1,16 +1,40 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, switchMap, throwError, timeout } from 'rxjs';
 import { User } from '../user/user.page';
 import { Product } from '../product/product.page'
+import { Order } from '../order/order.page';
+import { Board } from '../board/board.page';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:3000';  // La URL de la API externa
+  //private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'http://192.168.1.93:3000';
+  //private apiUrl = 'http://192.168.84.40:3000';
+  //private apiUrl = 'http://192.168.100.74:3000';
 
-  constructor(private http: HttpClient) {}
+  private apiConnectionStatus = new BehaviorSubject<boolean>(false);
+  connectionStatus$ = this.apiConnectionStatus.asObservable();
+
+  constructor(private http: HttpClient) {
+    this.checkApiConnection().subscribe(status => {
+      this.apiConnectionStatus.next(status);
+    });
+  }
+  
+  checkApiConnection(): Observable<boolean> {
+    return this.http.get(`${this.apiUrl}/users`).pipe(
+      timeout(3000),
+      map(() => true),
+      catchError(() => of(false))
+    );
+  }
+
+  getConnectionStatus(): boolean {
+    return this.apiConnectionStatus.getValue();
+  }
 
   // Método para realizar una petición GET a la API
   getData(): Observable<any> {
@@ -32,7 +56,6 @@ export class ApiService {
   }
 
   getUserByUserName(userName: string) {
-    console.log(this.http.get(`${this.apiUrl}/users/?userName=${userName}`));
     return this.http.get(`${this.apiUrl}/users/?userName=${userName}`);
   }
 
@@ -44,9 +67,24 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/users/`, user);
   }
 
-  editUser(user: any): Observable<any> {
+  editUser(user: User): Observable<any> {
     return this.http.put(`${this.apiUrl}/users/${user.id}`, user);
   }
+
+  editUserByUsername(updatedUserData: User): Observable<any> {
+    const userName = updatedUserData.userName;
+    return this.getUserByUserName(userName).pipe(
+      switchMap((user: any) => {
+        if (user != null) {
+          const updatedUser = { ...user, ...updatedUserData };
+          return this.editUser(updatedUser);
+        } else {
+          throw new Error('Usuario no encontrado');
+        }
+      })
+    );
+  }
+
   deleteUser(userId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/users/${userId}`);
   }
@@ -84,5 +122,57 @@ export class ApiService {
 
   editProduct(product: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/products/${product.id}`, product);
+  }
+
+  //Funciones Pedido(Order)//
+
+  getOrder(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.apiUrl}/order`);
+  }
+
+  getOrderById(id: string) {
+    return this.http.get(`${this.apiUrl}/order/${id}`);
+  }
+
+  getOrderByproductName(productName: string) {
+    return this.http.get(`${this.apiUrl}/products/?productName=${productName}`); //POsible modificacion//
+  }
+
+  addOrder(order: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/order/`, order);
+  }
+
+  deleteOrder(orderId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/order/${orderId}`);
+  }
+
+  editOrder(order: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/order/${order.id}`, order);
+  }
+
+  //Funciones Api Mesa//
+
+  getBoard(): Observable<Board[]> {
+    return this.http.get<Board[]>(`${this.apiUrl}/board`);
+  }
+
+  getBoardById(id: string) {
+    return this.http.get(`${this.apiUrl}/board/${id}`);
+  }
+
+  getBoardByboardName(productName: string) {
+    return this.http.get(`${this.apiUrl}/products/?productName=${productName}`); //Posible Modificacion//
+  }
+
+  addBoard(board: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/board/`, board);
+  }
+
+  deleteBoard(boardId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/board/${boardId}`);
+  }
+
+  editBoard(board: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/board/${board.id}`, board);
   }
 }

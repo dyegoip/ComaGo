@@ -6,11 +6,11 @@ import { Router } from '@angular/router';
 import { SQliteService } from '../services/sqlite.service';
 
 @Component({
-  selector: 'app-edit-user',
-  templateUrl: './edit-user.page.html',
-  styleUrls: ['./edit-user.page.scss'],
+  selector: 'app-view-user',
+  templateUrl: './view-user.page.html',
+  styleUrls: ['./view-user.page.scss'],
 })
-export class EditUserPage implements OnInit {
+export class ViewUserPage implements OnInit {
 
   userForm!: FormGroup;
   apiConnect: boolean = false;
@@ -24,11 +24,11 @@ export class EditUserPage implements OnInit {
   ngOnInit() {
     this.userForm = this.formBuilder.group({
       id: ['', []],
-      userName: ['', [Validators.required]],
-      fullName: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      rol: ['',[Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      userName: [{ value: '', disabled: true }, [Validators.required]],
+      fullName: [{ value: '', disabled: true }, [Validators.required]],
+      email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
+      rol: [{ value: '', disabled: true }, [Validators.required]],
+      password: [{ value: '', disabled: true }, [Validators.required, Validators.minLength(6)]],
     });
   
     const navigation = this.router.getCurrentNavigation();

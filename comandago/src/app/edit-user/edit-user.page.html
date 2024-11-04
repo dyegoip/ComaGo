@@ -12,7 +12,7 @@
     <form [formGroup]="userForm" (ngSubmit)="onEditUser()">
       <ion-item>
         <ion-label position="floating">Nombre de Usuario</ion-label>
-        <ion-input formControlName="userName" required></ion-input>
+        <ion-input formControlName="userName" required [disabled]="true"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label position="floating">Nombre Completo</ion-label>
@@ -22,15 +22,24 @@
         <ion-label position="floating">Correo Electrónico</ion-label>
         <ion-input type="email" formControlName="email" required></ion-input>
       </ion-item>
+      <ion-list>
+        <ion-item>
+          <ion-select formControlName="rol" label="Rol" interface="action-sheet" label-placement="floating" required>
+            <ion-select-option value="1">Administrador</ion-select-option>
+            <ion-select-option value="2">Garzon</ion-select-option>
+            <ion-select-option value="3">Cocinero</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
       <ion-item>
         <ion-label position="floating">Contraseña</ion-label>
-        <ion-input type="password" formControlName="password" required></ion-input>
+        <ion-input formControlName="password" type="password" required></ion-input>
       </ion-item>
       <div class="password">
-        <ion-button id="addButton" type="submit" color="primary" [disabled]="userForm.invalid">Guardar</ion-button>
+        <ion-button id="addButton" type="submit" color="success" [disabled]="userForm.invalid">Guardar</ion-button>
       </div>
       <div class="password">
-        <ion-button id="backButton" type="submit" color="primary" (click)="navigateToUser()">Volver</ion-button>
+        <ion-button id="backButton" color="warning" (click)="navigateToUser()">Volver</ion-button>
       </div>
     </form>
   </div>

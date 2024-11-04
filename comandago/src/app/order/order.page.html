@@ -7,4 +7,19 @@
   </ion-toolbar>
 </ion-header>
 
-  
+<ion-button (click)="onSaveOrder()">Crear pedido</ion-button>
+<ion-item>
+  <ion-select label="Seleccione Producto" interface="action-sheet" label-placement="floating" required>
+    <ion-select>
+      <ion-select-option *ngFor="let product of allProducts" [value]="product.id">
+        {{ product.productName }}
+      </ion-select-option>
+    </ion-select>
+  </ion-select>
+  <div>
+    <ion-button type="buttom" color="primary">Añadir</ion-button>
+  </div>
+</ion-item>
+
+
+<ion-button type="submit" color="primary">Comfirmar pedido</ion-button>

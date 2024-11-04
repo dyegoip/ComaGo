@@ -1,11 +1,12 @@
+import { AppComponent } from './../app.component';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { NavigationExtras, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 import { User } from '../user/user.page';
-import { SQLiteService } from '../services/sqlite.service';
-
+import { SQliteService } from '../services/sqlite.service';
+import { Observable, } from 'rxjs';
 
 @Component({
   selector: 'app-add-user',
@@ -17,23 +18,52 @@ export class AddUserPage implements OnInit {
   userForm!: FormGroup;
   users: User[] = [];
   nextId: string = "0";
+  apiConnect: boolean = true;
+  ok: boolean = false;
+  idRandom: number = 0;
 
   constructor(private formBuilder: FormBuilder, 
               private apiService: ApiService, 
               private alertController: AlertController,
-              private sqliteService: SQLiteService,
-              private router: Router ) { }
+              private sqliteService: SQliteService,
+              private router: Router,
+              private appComponent: AppComponent) { }
 
   ngOnInit() {
     this.getUsersFromApi();
+    this.idRandom = this.appComponent.getRandomID();
+    console.log("add-user random : " + this.idRandom);
+    
     this.userForm = this.formBuilder.group({
-      id: ['',[]],
+      id: ['',],
       userName: ['', [Validators.required]],
       fullName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
+      rol: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
+
+    //Verificacion de la conexión de la api
+    this.apiService.checkApiConnection().subscribe(status => {
+      this.apiConnect = status;
+      console.log('Estado de conexión a la API:', this.apiConnect);
+    });
   }
+
+  ionViewWillEnter() {
+    this.userForm.reset();
+  }
+
+  async initializeDatabase() {
+    try {
+      // Iniciar la base de datos
+      await this.sqliteService.initDB();
+      console.log('Base de datos inicializada correctamente');
+    } catch (error) {
+      console.error('Error al inicializar la base de datos:', error);
+    }
+  }
+  
   navigateToUser() {
     this.router.navigate(['/user']);
   }
@@ -42,7 +72,6 @@ export class AddUserPage implements OnInit {
     this.apiService.getUsers().subscribe(
       (data: User[]) => {
         this.users = data;
-        this.generateNextId();
       },
       (error) => {
         console.error('Error al traer los usuarios:', error);
@@ -51,57 +80,116 @@ export class AddUserPage implements OnInit {
     );
   }
 
-  generateNextId() {
-    if (this.users.length > 0) {
-      const lastUser = this.users.reduce((prev, current) => (prev.id > current.id) ? prev : current);
-      this.nextId = ((+lastUser.id) + 1).toString();
-    }
-  }
-
-  // Función que se llama cuando el formulario se envía
   async onSaveUser() {
+    let msgError = '';
+    
     if (this.userForm.valid) {
+      this.userForm.patchValue({
+        id: this.idRandom
+      });
       const newUser = this.userForm.value;
-      newUser.id = this.nextId;
+      let createUser: number | null = null;
 
-      await this.sqliteService.createUser(newUser);
-
-      this.apiService.addUser(newUser).subscribe(async response => {
-        console.log('Usuario añadido exitosamente', response);
-
-        // Crear y mostrar el alert
-        const alert = await this.alertController.create({
-          header: 'Usuario Creado',
-          message: 'El Usuario ' + newUser.fullName + ' ha sido creado con éxito.',
-          buttons: [
-            {
-              text: 'Aceptar',
-              handler: () => {
-                this.router.navigate(['/add-user']).then(() => {
-                  window.location.reload();
-                });
+      createUser = await this.sqliteService.addUser(newUser);
+      
+      if (typeof(createUser) === 'number') {
+        this.ok = true;
+        console.log('Usuario guardado en SQLite');
+        
+        if (this.apiConnect) {
+          await this.apiService.addUser(newUser).subscribe(async response => { 
+            console.log('Usuario creado en la API exitosamente.');
+            
+            await this.sqliteService.delUser(newUser.userName);
+            console.log('Usuario eliminado de SQLite después de sincronización.');
+  
+            const alert = await this.alertController.create({
+              header: 'Usuario Creado',
+              message: 'El Usuario ' + newUser.fullName + ' ha sido sincronizado con la API con éxito.',
+              buttons: [
+                {
+                  text: 'Aceptar',
+                  handler: () => {
+                    this.router.navigate(['/add-user']).then(() => {
+                      window.location.reload();
+                    });
+                  }
+                }
+              ],
+            });
+            await alert.present();
+          }, async error => {
+            msgError = error;
+            this.ok = false;
+            console.error('Error al crear el usuario en la API. ', msgError);
+  
+            const alert = await this.alertController.create({
+              header: 'Error de Sincronización',
+              message: 'El Usuario no se pudo sincronizar con la API. Intentar más tarde.',
+              buttons: [
+                {
+                  text: 'Aceptar',
+                  handler: () => {}
+                }
+              ],
+            });
+            await alert.present();
+          });
+        } else {
+          console.log('No hay conexión a la API, usuario guardado solo en SQLite.');
+  
+          const alert = await this.alertController.create({
+            header: 'Usuario Creado',
+            message: 'El Usuario ' + newUser.fullName + ' ha sido creado y guardado en la base de datos local (SQLite).',
+            buttons: [
+              {
+                text: 'Aceptar',
+                handler: () => {
+                  this.router.navigate(['/add-user']).then(() => {
+                    window.location.reload();
+                  });
+                }
               }
-            }
-          ],
-        });
-
-        await alert.present();
-
-      }, async error => {
-        console.error('Error al añadir el usuario', error);
+            ],
+          });
+          await alert.present();
+        }
+      } else {
+        // Si hay un error al guardar en SQLite
+        this.ok = false;
+        console.error('Error al crear el usuario en SQLite. ', msgError);
+  
+        // Mostrar un alert de error
         const alert = await this.alertController.create({
           header: 'Error de Usuario',
-          message: 'Error al añadir el usuario ' +  error,
+          message: 'Error al guardar el usuario en la base de datos local.',
           buttons: [
             {
               text: 'Aceptar',
-              handler: () => {
-              }
+              handler: () => {}
             }
           ],
         });
-      });
+        await alert.present();
+      }
     }
-  }
+  } 
 
+  passwordValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value || '';
+  
+    // Verifica si hay al menos 4 números
+    const hasFourNumbers = (value.match(/\d/g) || []).length >= 4;
+    
+    // Verifica si hay al menos 3 caracteres (cualquier cosa que no sea un espacio en blanco)
+    const hasThreeCharacters = (value.match(/[^\s]/g) || []).length >= 3;
+  
+    // Verifica si hay al menos 1 letra mayúscula
+    const hasUpperCase = /[A-Z]/.test(value);
+  
+    const valid = hasFourNumbers && hasThreeCharacters && hasUpperCase;
+  
+    // Si la contraseña no es válida, devuelve un objeto con el error
+    return !valid ? { passwordInvalid: true } : null;
+  }
 }

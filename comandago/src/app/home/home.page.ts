@@ -1,3 +1,4 @@
+import { SQliteService } from './../services/sqlite.service';
 import { User } from './../user/user.page';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
@@ -5,14 +6,15 @@ import { Router, RouterLink } from '@angular/router';
 import { IonicModule, MenuController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule
-  ],
+  imports: [CommonModule, IonicModule],
+  providers: [SQliteService, ApiService]
 })
 export class HomePage implements OnInit {
 
@@ -20,11 +22,18 @@ export class HomePage implements OnInit {
   userId!: string;
   userApi: any = {};
   userAuth!: User;
+  newUser!: User;
   public image: string = "";
+  random: number = 0;
 
-  constructor(private router: Router, private apiService: ApiService, private menu: MenuController) {}
+  constructor(private router: Router, 
+              private apiService: ApiService, 
+              private menu: MenuController, 
+              private sqliteService: SQliteService, 
+              private appComponent: AppComponent) {}
 
   ngOnInit() {
+
     const navigation = this.router.getCurrentNavigation();
     if (navigation && navigation.extras.state && navigation.extras.state['userId'] != null) {
       this.userId = navigation.extras.state['userId'];
@@ -68,10 +77,16 @@ export class HomePage implements OnInit {
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
-      resultType: CameraResultType.Base64,  // Puedes usar 'Uri' si prefieres una URL de archivo.
-      source: CameraSource.Camera           // Para elegir entre cámara o galería.
+      resultType: CameraResultType.Base64,
+      source: CameraSource.Camera
     });
 
-    this.image = `data:image/jpeg;base64,${image.base64String}`;  // Puedes mostrar esta imagen en el HTML
+    this.image = `data:image/jpeg;base64,${image.base64String}`; 
   }
+
+  async getRamdon() {
+    this.random = await this.appComponent.getRandomID();
+  }
+
+  
 }

@@ -1,90 +1,318 @@
 import { Injectable } from '@angular/core';
-import { CapacitorSQLite, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
+import { User } from '../user/user.page';
+import { Product } from '../product/product.page';
+import { Order } from '../order/order.page';
+import { Board } from '../board/board.page';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
-export class SQLiteService {
-  public db: SQLiteDBConnection | null = null;
+export class SQliteService {
+  private dbInstance: SQLiteObject | null = null;
 
-  constructor() {
-    this.openDatabase(); // Abre la base de datos al inicializar el servicio
-  }
+  constructor(private sqlite: SQLite) {}
 
-  // Método para abrir la base de datos
-  async openDatabase(): Promise<void> {
+  async initDB() {
     try {
-      // Crea la conexión correctamente con await
-      await CapacitorSQLite.createConnection({
-        database: 'mydb',
-        encrypted: false,
-        mode: 'no-encryption',
-        version: 1,
+      this.dbInstance = await this.sqlite.create({
+        name: 'comanda.db',
+        location: 'default'
       });
-  
-      // Verifica si la conexión fue exitosa antes de abrirla
-      if (this.db) {
-        await this.db.open(); // Solo llamamos a open si this.db no es null
-        console.log('Base de datos abierta correctamente');
-      } else {
-        console.error('No se pudo obtener una conexión válida');
-      }
+
+      // Habilitar claves foráneas
+      await this.dbInstance.executeSql('PRAGMA foreign_keys = ON;', []);
+
+      await this.dbInstance.executeSql(`
+        CREATE TABLE IF NOT EXISTS USER (
+          IDUSER TEXT PRIMARY KEY,
+          USERNAME TEXT UNIQUE,
+          FULLNAME TEXT,
+          EMAIL TEXT UNIQUE,
+          PASSWORD TEXT,
+          ROL INTEGER
+        );
+      `, []);
+
+      await this.dbInstance.executeSql(`
+        CREATE TABLE IF NOT EXISTS PRODUCTS (
+          IDPRODUCT INT PRIMARY KEY,
+          PRODUCTNAME TEXT UNIQUE,
+          PRODUCTCODE TEXT UNIQUE,
+          PRICE INT,
+          STOCK INT,
+          ACTIVE INT,
+          TYPEPRODUCT TEXT
+        )
+      `, []);
+
+      await this.dbInstance.executeSql(`
+        CREATE TABLE IF NOT EXISTS "ORDER" (
+          IDORDER INT PRIMARY KEY,
+          ORDERNUM INT UNIQUE,
+          USERNAME TEXT,
+          ORDERDATE DATE,
+          TOTALPRICE INT,
+          STATUS INT
+        )
+      `, []);
+
+      await this.dbInstance.executeSql(`
+        CREATE TABLE IF NOT EXISTS ORDERDETAIL (
+          IDDETAIL INT PRIMARY KEY,
+          PRODUCTCODE TEXT,
+          ORDERNUM INT,
+          QUANTITY INT,
+          PRICE INT,
+          FOREIGN KEY (ORDERNUM) REFERENCES "ORDER"(ORDERNUM)
+        )
+      `, []);
+
+      await this.dbInstance.executeSql(`
+        CREATE TABLE IF NOT EXISTS BOARD (
+          BOARDID INT,
+          NUMBERBOARD INT,
+          CAPACITY INT,
+          STATUS INT
+        )
+      `, []);
+
     } catch (error) {
-      console.error('Error al abrir la base de datos:', error);
+      console.error('Error creating database', JSON.stringify(error));
     }
   }
 
-  // Método para crear la tabla de usuarios
-  async createTableUser() {
-    if (!this.db) {
-      await this.openDatabase(); // Abre la base de datos si aún no está abierta
-    }
+
+  async addUser(user: User): Promise<number> {
+    //const salt = await bcrypt.genSalt(10);
+    //user.password = await bcrypt.hash(user.password, salt);
     
-    if (this.db) { // Asegúrate de que db no es null antes de ejecutar consultas
-      try {
-        await this.db.query(`
-          CREATE TABLE IF NOT EXISTS user (
-            id TEXT PRIMARY KEY,
-            userName TEXT NOT NULL,
-            fullName TEXT NOT NULL,
-            email TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL
-          )
-        `);
-        console.log('Tabla user creada exitosamente');
-      } catch (error) {
-        console.error('Error al crear la tabla user:', error);
+    if (this.dbInstance) {
+      const sql = `INSERT INTO USER (IDUSER, USERNAME, FULLNAME, EMAIL, PASSWORD, ROL) VALUES (?, ?, ?, ?, ?, ?)`;
+      const values = [user.id, user.userName, user.fullName, user.email, user.password, user.rol];
+      const res = await this.dbInstance.executeSql(sql, values);
+      console.log(JSON.stringify(res));
+      return res.insertId;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async delUser(userName: string): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `DELETE FROM USER WHERE USERNAME = ?`;
+      const values = [userName];
+      const res = await this.dbInstance.executeSql(sql, values);
+      
+      return res.rowsAffected;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+  
+
+  async getUserByuserName(username: string): Promise<User | null> {
+    if (this.dbInstance) {
+      const sql = `SELECT * FROM USER WHERE USERNAME = ?`;
+      const values = [username];
+      const res = await this.dbInstance.executeSql(sql, values);
+      if (res.rows.length > 0) {
+        const user = res.rows.item(0);
+        return {
+          id: user.IDUSER,
+          userName: user.USERNAME,
+          fullName: user.FULLNAME,
+          email: user.EMAIL,
+          password: user.PASSWORD,
+          rol: user.ROL
+        };
+      } else {
+        return null;
       }
     } else {
-      console.error('No se pudo abrir la base de datos.');
+      throw new Error('Database is not initialized');
     }
   }
 
-  // Método para insertar un usuario
-  async createUser(newUser: any) {
-    if (!this.db) {
-      await this.openDatabase(); // Abre la base de datos si aún no está abierta
-      await this.createTableUser();
-    }
-
-    if (this.db) { // Verifica que db no es null
+  async getUserLikeByName(fullname: string): Promise<User[]| null> {
+    if (this.dbInstance) {
+      const likeFullname = `%${fullname}%`;
+      const sql = `SELECT * FROM USER WHERE FULLNAME LIKE ?`;
+      const values = [likeFullname];
+      
       try {
-        await this.db.query(
-          'INSERT INTO user (id, userName, fullName, email, password) VALUES (?, ?, ?, ?, ?)',
-          [newUser.id, newUser.userName, newUser.fullName, newUser.email, newUser.password]
-        );
-        console.log('Usuario creado exitosamente');
-      } catch (error) {
-        if (error instanceof Error) {
-          if (error.message.includes('UNIQUE constraint failed')) {
-            console.error('El correo ya está en uso');
-          } else {
-            console.error('Error al crear usuario:', error.message);
+        const res = await this.dbInstance.executeSql(sql, values);  // Ejecutar la consulta con valores
+        
+        if (res && res.rows && res.rows.length > 0){
+          const users : User[] = [];
+          for (let i = 0; i < res.rows.length; i++) {
+            const user = res.rows.item(i)
+            users.push({
+              id: user.IDUSER,
+              userName: user.USERNAME,
+              fullName: user.FULLNAME,
+              email: user.EMAIL,
+              password: user.PASSWORD,
+              rol: user.ROL
+            });
           }
+          return users;
         } else {
-          console.error('Error inesperado:', error);
+          return null;
         }
+      } catch (error) {
+        console.error('Error al consultar usuarios ', JSON.stringify(error));
+        return null;
       }
+    } else {
+      throw new Error('Database is not initialized');
     }
   }
+
+  async getAllUsers(): Promise<User[]| null> {
+    if (this.dbInstance) {
+      const likeFullname = `%%`;
+      const sql = `SELECT * FROM USER WHERE FULLNAME LIKE ?`;
+      const values = [likeFullname];
+      
+      try {
+        const res = await this.dbInstance.executeSql(sql, values);
+        
+        if (res && res.rows && res.rows.length > 0){
+          const users : User[] = [];
+          for (let i = 0; i < res.rows.length; i++) {
+            const user = res.rows.item(i);
+            console.log(user.IDUSER);
+            users.push({
+              id: user.IDUSER,
+              userName: user.USERNAME,
+              fullName: user.FULLNAME,
+              email: user.EMAIL,
+              password: user.PASSWORD,
+              rol: user.ROL
+            });
+          }
+          return users;
+        } else {
+          return null;
+        }
+      } catch (error) {
+        console.error('Error al consultar todos los usuarios ', JSON.stringify(error));
+        return null;
+      }
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+  
+  
+  // Function Order//
+
+  async addOrder(order: Order): Promise<number> {
+
+    if (this.dbInstance) {
+      const sql = `INSERT INTO ORDER (ORDERNUM, USERNAME, ORDERDATE, TOTALPRICE, STATUS) VALUES (?, ?, ?, ?, ?)`;
+      const values = [order.orderNum, order.userName, order.orderDate, order.totalPrice, order.status];
+      const res = await this.dbInstance.executeSql(sql, values);
+      return res.insertId;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async delOrder(orderNum: number): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `DELETE FROM ORDER WHERE ORDERNUM = ?`;
+      const values = [orderNum];
+      const res = await this.dbInstance.executeSql(sql, values);
+      
+      return res.rowsAffected;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async getOrderByorderNumber(orderNum: number): Promise<Order | null> {
+    if (this.dbInstance) {
+      const sql = `SELECT * FROM ORDER WHERE USERNAME = ?`;
+      const values = [orderNum];
+      const res = await this.dbInstance.executeSql(sql, values);
+      if (res.rows.length > 0) {
+        const order = res.rows.item(0);
+        return {
+          id: order.id,
+          orderNum: order.orderNum,
+          userName: order.userName,
+          orderDate: order.orderDate,
+          totalPrice: order.totalPrice,
+          status: order.status
+
+        };
+      } else {
+        return null;  // No se encontró un administrador con ese correo
+      }
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async addOrderDetail(order: Order): Promise<number> {
+
+    if (this.dbInstance) {
+      const sql = `INSERT INTO ORDERDETAIL (IDDETAIL, PRODUCTCODE, ORDERNUM, QUANTITY, PRICE) VALUES (?, ?, ?, ?, ?)`;
+      const values = [order.orderNum, order.userName, order.orderDate, order.totalPrice, order.status];
+      const res = await this.dbInstance.executeSql(sql, values);
+      return res.insertId;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  //Funciones Mesa//
+
+  async addBoard(board: Board): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `INSERT INTO BOARD (BOARDID, NUMBERBOARD, CAPACITY, STATUS) VALUES (?, ?, ?, ?)`;
+      const values = [board.id, board.numberBoard, board.capacity, board.status];
+      const res = await this.dbInstance.executeSql(sql, values);
+      return res.insertId;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async delBoard(boardId: number): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `DELETE FROM BOARD WHERE BOARDID = ?`;
+      const values = [boardId];
+      const res = await this.dbInstance.executeSql(sql, values);
+      
+      return res.rowsAffected;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async getBoardByboardNumber(boardNum: number): Promise<Board | null> {
+    if (this.dbInstance) {
+      const sql = `SELECT * FROM BOARD WHERE NUMBERBOARD = ?`;
+      const values = [boardNum];
+      const res = await this.dbInstance.executeSql(sql, values);
+      if (res.rows.length > 0) {
+        const board = res.rows.item(0);
+        return {
+          id: board.id,
+          numberBoard: board.numberBoard,
+          capacity: board.capacity,
+          status: board.status
+        };
+
+      } else {
+        return null;  // No se encontró un administrador con ese correo
+      }
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
 }

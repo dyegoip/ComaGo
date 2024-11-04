@@ -1,16 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import { ApiService } from './../services/api.service';
 import { AlertController } from '@ionic/angular';
+import { SQliteService } from '../services/sqlite.service';
 
 export interface Product {
-  id: number;
+  id: string;
   productName: string;
+  productCode: string;
   price: number;
   stock: number;
   active: boolean;
   type: string;
-  showOptions?: boolean;
 }
 
 @Component({
@@ -23,14 +24,24 @@ export class ProductPage implements OnInit {
   allProducts : Product[] = [];
   filteredProducts: Product[] = [];
   searchQuery: string = '';
-  find: boolean = false;
+  find: boolean = true;
+  apiConnect: boolean = false;
+  logMessages: string[] = [];
+  msgScreen: string = 'empty';
 
   constructor(private router: Router, 
-              private apiService: ApiService, 
-              private alertController: AlertController) { }
+              private apiService: ApiService,
+              private sqliteService: SQliteService,
+              private alertController: AlertController,
+              private changeDetector: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.getProductInit();
+  }
+
+  addLog(message: string) {
+    this.logMessages.push(message);
+    this.changeDetector.detectChanges()
   }
 
   ToAddProduct() {
@@ -46,7 +57,6 @@ export class ProductPage implements OnInit {
       (data: Product[]) => {
         this.allProducts = data.map(product => ({
           ...product,
-          showOptions: false // Inicializar showOptions en false
         }));
         this.allProducts = data;
         this.filteredProducts = data;  // Al principio, no hay filtro, así que mostramos todos los productos
@@ -108,6 +118,19 @@ export class ProductPage implements OnInit {
     });
   }
 
+  onViewProductDetails(product: Product) {
+    const navigationExtras: NavigationExtras = {
+      state: {
+        productEdit: product
+      },
+    }
+    console.log('Ver usuario:', product.productName);
+
+    this.router.navigate(['/view-product'], navigationExtras).then(() => {
+      window.location.reload();
+    });
+  }
+
   async onDeleteProduct(product: Product) {
     // Lógica para eliminar usuario
     console.log('Eliminar producto:', product.productName);
@@ -160,9 +183,34 @@ export class ProductPage implements OnInit {
     }
   }
 
-  onViewProductDetails(product: Product) {
-    // Lógica para ver detalles del usuario
-    console.log('Ver detalles de usuario:', product.productName);
+  async syncUsersWithApi() {
+    try {
+      const users = await this.sqliteService.getAllUsers();
+      
+      if (users && users.length > 0) {
+        for (const user of users) {
+          try {
+            // Intentar insertar el usuario en la API
+            const response = await this.apiService.addUser(user).toPromise();
+            if (response) {
+              this.addLog(`Usuario ${user.userName} - ${user.id} insertado en la API exitosamente`);
+
+              // Eliminar el usuario de SQLite después de confirmación de inserción en la API
+              await this.sqliteService.delUser(user.userName);
+              this.addLog(`Usuario ${user.userName} - ${user.id} eliminado de SQLite exitosamente`);
+            }
+          } catch (error) {
+            this.addLog(`Error al insertar el usuario ${user.userName} - ${user.id} en la API: ` + error);
+          }
+        }
+      } else {
+        this.addLog('No se encontraron usuarios en la base de datos SQLite para sincronizar.');
+      }
+    } catch (error) {
+      this.addLog('Error durante la sincronización de usuarios: ' + error);
+    }
   }
+
+
 
 }

@@ -8,10 +8,18 @@
 </ion-header>
 
 <ion-content>
-  <!-- Botón para agregar un nuevo usuario -->
-  <div class="password">
-    <ion-button slot="end" id="searchButton" color="success" (click)="ToAddUser()">Añadir Usuario</ion-button>
-  </div>
+
+  <ion-row>
+    <ion-col>
+      <!-- Botón para agregar un nuevo usuario -->
+      <ion-button id="addUserButton" color="success" (click)="ToAddUser()">Añadir Usuario</ion-button>
+    </ion-col>
+    <ion-col class="ion-text-right">
+      <!-- Botón para sincronizar -->
+      <ion-button id="syncButton" color="secondary" (click)="syncUsersWithApi()">Sincronizar</ion-button>
+    </ion-col>
+  </ion-row>
+
   <!-- Input para buscar usuario -->
   <ion-item>
     <ion-label position="floating">Buscar Usuario</ion-label>
@@ -19,10 +27,10 @@
   </ion-item>
 
   <div class="password">
-    <ion-button id="searchButton" color="primary" (click)="searchUser()">Buscar</ion-button>
+    <ion-button id="searchButton" color="primary" (click)="getUserLikebyName()">Buscar</ion-button>
   </div>
 
-  <ion-list *ngIf="find">
+  <ion-list *ngIf="filteredUsers.length > 0 && find">
     <ion-list-header>
       <ion-label>Usuarios Encontrados</ion-label>
     </ion-list-header>
@@ -50,9 +58,20 @@
   
 
   <!-- Mensaje cuando no hay usuarios -->
-  <ion-card *ngIf="filteredUsers.length === 0 && find">
+  <ion-card *ngIf="msgScreen != 'empty' && !find">
     <ion-card-header>
-      <ion-card-title>No se encontraron usuarios</ion-card-title>
+      <ion-card-title>{{msgScreen}}</ion-card-title>
+    </ion-card-header>
+  </ion-card>
+
+  <ion-card *ngIf="logMessages.length > 0">
+    <ion-card-header>
+      <div *ngFor="let log of logMessages">
+        <p>{{ log }}</p>
+      </div>
+      <div class="password">
+        <ion-button color="danger" (click)="onDeleteLogs()">Borrar Log</ion-button>
+      </div>
     </ion-card-header>
   </ion-card>
 
