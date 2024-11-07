@@ -22,6 +22,7 @@ export class ViewProductPage implements OnInit {
     this.productForm = this.formBuilder.group({
       id: [{ value: '', disabled: true }, []],
       productName: [{ value: '', disabled: true }, [Validators.required]],
+      productCode: [{ value: '', disabled: true }, [Validators.required]],
       price: [{ value: '', disabled: true },[Validators.required, Validators.pattern("^[0-9]*$")]],
       stock: [{ value: '', disabled: true }, [Validators.required, Validators.min(0)]],
       active: [{ value: '', disabled: true },[]],
@@ -36,6 +37,7 @@ export class ViewProductPage implements OnInit {
       this.productForm.patchValue({
         id: productEdit.id,
         productName: productEdit.productName,
+        productCode: productEdit.productCode,
         price: productEdit.price,
         stock: productEdit.stock,
         active: "false",

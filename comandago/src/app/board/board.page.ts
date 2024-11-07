@@ -5,7 +5,7 @@ import { AlertController } from '@ionic/angular';
 
 export interface Board {
   id: string;
-  numberBoard: number;
+  boardnum: number;
   capacity: number;
   status: number;
 }

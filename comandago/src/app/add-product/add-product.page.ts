@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 import { Product } from '../product/product.page';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-add-product',
@@ -14,17 +15,23 @@ export class AddProductPage implements OnInit {
 
   productForm!: FormGroup;
   products: Product[] = [];
+  idRandom: number = 0;
 
   constructor(private formBuilder: FormBuilder, 
               private apiService: ApiService, 
               private alertController: AlertController,
-              private router: Router) { }
+              private router: Router,
+              private appComponent: AppComponent) { }
 
   ngOnInit() {
     this.getProductsFromApi();
+    this.idRandom = this.appComponent.getRandomID();
+    console.log("add-user random : " + this.idRandom);
+
     this.productForm = this.formBuilder.group({
       id: ['', []],
       productName: ['', [Validators.required]],
+      productCode: ['', [Validators.required]],
       price: ['', [Validators.required, Validators.min(0)]],
       stock: ['', [Validators.required, Validators.min(0)]],
       active: ['', []],
@@ -46,6 +53,9 @@ export class AddProductPage implements OnInit {
 
   async onSaveProduct() {
     if (this.productForm.valid) {
+      this.productForm.patchValue({
+        id: this.idRandom.toString()
+      });
       const newProduct = this.productForm.value;
       newProduct.active = "false";
 

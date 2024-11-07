@@ -11,6 +11,10 @@
   <div class="container-father">
     <form [formGroup]="productForm">
       <ion-item>
+        <ion-label position="stacked">Codigo Producto</ion-label>
+        <ion-text>{{ productForm.get('productCode')?.value }}</ion-text>
+      </ion-item>
+      <ion-item>
         <ion-label position="stacked">Nombre Producto</ion-label>
         <ion-text>{{ productForm.get('productName')?.value }}</ion-text>
       </ion-item>

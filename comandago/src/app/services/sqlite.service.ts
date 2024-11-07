@@ -36,7 +36,7 @@ export class SQliteService {
 
       await this.dbInstance.executeSql(`
         CREATE TABLE IF NOT EXISTS PRODUCTS (
-          IDPRODUCT INT PRIMARY KEY,
+          IDPRODUCT TEXT PRIMARY KEY,
           PRODUCTNAME TEXT UNIQUE,
           PRODUCTCODE TEXT UNIQUE,
           PRICE INT,
@@ -48,8 +48,9 @@ export class SQliteService {
 
       await this.dbInstance.executeSql(`
         CREATE TABLE IF NOT EXISTS "ORDER" (
-          IDORDER INT PRIMARY KEY,
+          IDORDER TEXT PRIMARY KEY,
           ORDERNUM INT UNIQUE,
+          BOARDNUM INT,
           USERNAME TEXT,
           ORDERDATE DATE,
           TOTALPRICE INT,
@@ -59,7 +60,7 @@ export class SQliteService {
 
       await this.dbInstance.executeSql(`
         CREATE TABLE IF NOT EXISTS ORDERDETAIL (
-          IDDETAIL INT PRIMARY KEY,
+          IDDETAIL TEXT,
           PRODUCTCODE TEXT,
           ORDERNUM INT,
           QUANTITY INT,
@@ -70,8 +71,8 @@ export class SQliteService {
 
       await this.dbInstance.executeSql(`
         CREATE TABLE IF NOT EXISTS BOARD (
-          BOARDID INT,
-          NUMBERBOARD INT,
+          IDBOARD TEXT PRIMARY KEY,
+          BOARDNUM INT,
           CAPACITY INT,
           STATUS INT
         )
@@ -209,16 +210,16 @@ export class SQliteService {
   // Function Order//
 
   async addOrder(order: Order): Promise<number> {
-
     if (this.dbInstance) {
-      const sql = `INSERT INTO ORDER (ORDERNUM, USERNAME, ORDERDATE, TOTALPRICE, STATUS) VALUES (?, ?, ?, ?, ?)`;
-      const values = [order.orderNum, order.userName, order.orderDate, order.totalPrice, order.status];
+      const sql = `INSERT INTO ORDER (IDORDER, ORDERNUM, BOARDNUM, USERNAME, ORDERDATE, TOTALPRICE, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+      const values = [order.id, order.orderNum, order.boardNum, order.userName, order.orderDate, order.totalPrice, order.status];
       const res = await this.dbInstance.executeSql(sql, values);
       return res.insertId;
     } else {
       throw new Error('Database is not initialized');
     }
   }
+  
 
   async delOrder(orderNum: number): Promise<number> {
     if (this.dbInstance) {
@@ -242,6 +243,7 @@ export class SQliteService {
         return {
           id: order.id,
           orderNum: order.orderNum,
+          boardNum: order.boardNum,
           userName: order.userName,
           orderDate: order.orderDate,
           totalPrice: order.totalPrice,
@@ -272,8 +274,8 @@ export class SQliteService {
 
   async addBoard(board: Board): Promise<number> {
     if (this.dbInstance) {
-      const sql = `INSERT INTO BOARD (BOARDID, NUMBERBOARD, CAPACITY, STATUS) VALUES (?, ?, ?, ?)`;
-      const values = [board.id, board.numberBoard, board.capacity, board.status];
+      const sql = `INSERT INTO BOARD (BOARDID, NUMBOARD, CAPACITY, STATUS) VALUES (?, ?, ?, ?)`;
+      const values = [board.id, board.boardnum, board.capacity, board.status];
       const res = await this.dbInstance.executeSql(sql, values);
       return res.insertId;
     } else {
@@ -293,16 +295,16 @@ export class SQliteService {
     }
   }
 
-  async getBoardByboardNumber(boardNum: number): Promise<Board | null> {
+  async getBoardByboardNumber(boardnum: number): Promise<Board | null> {
     if (this.dbInstance) {
       const sql = `SELECT * FROM BOARD WHERE NUMBERBOARD = ?`;
-      const values = [boardNum];
+      const values = [boardnum];
       const res = await this.dbInstance.executeSql(sql, values);
       if (res.rows.length > 0) {
         const board = res.rows.item(0);
         return {
           id: board.id,
-          numberBoard: board.numberBoard,
+          boardnum: board.boardnum,
           capacity: board.capacity,
           status: board.status
         };

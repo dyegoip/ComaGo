@@ -11,10 +11,18 @@
     {
       "id": "126540",
       "userName": "seba",
-      "fullName": "Sebastian",
+      "fullName": "Sebastian Nunez",
       "email": "seba@duoc.cl",
       "rol": "1",
       "password": "123456"
+    },
+    {
+      "id": 177335,
+      "userName": "sfuentes",
+      "fullName": "Sfuentes sfuentes",
+      "email": "sfuentes@sfuentes.cl",
+      "rol": "2",
+      "password": "sfuentes.1234"
     }
   ],
   "products": [
@@ -29,7 +37,7 @@
     },
     {
       "id": "2",
-      "productName": "Chorrillana",
+      "productName": "Chorrillanas",
       "productCode": "PL-002",
       "price": 5600,
       "stock": 10,
@@ -42,7 +50,16 @@
       "productCode": "BE-001",
       "price": 1500,
       "stock": 50,
-      "active": false,
+      "active": true,
+      "type": "Liquidos"
+    },
+    {
+      "id": "181245",
+      "productName": "Limonada",
+      "productCode": "BE-002",
+      "price": 2500,
+      "stock": 30,
+      "active": true,
       "type": "Liquidos"
     }
   ],
@@ -50,6 +67,7 @@
     {
       "id": "1",
       "orderNum": 1,
+      "boardnum": 1,
       "userName": "dpenaloza",
       "orderDate": "10-10-2024",
       "totalPrice": 30000,
@@ -67,12 +85,28 @@
   ],
   "board": [
     {
-      "id": "1",
-      "productName": "Tallarines",
-      "price": 5500,
-      "stock": 3,
-      "active": "false",
-      "type": "Guarnicion"
+      "id": "123",
+      "boardnum": 1,
+      "capacity": 6,
+      "status": 1
+    },
+    {
+      "id": "3432",
+      "boardnum": 2,
+      "capacity": 3,
+      "status": 1
+    },
+    {
+      "id": "23432",
+      "boardnum": 3,
+      "capacity": 8,
+      "status": 1
+    },
+    {
+      "id": "567",
+      "boardnum": 4,
+      "capacity": 2,
+      "status": 1
     }
   ]
 }

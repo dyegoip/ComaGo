@@ -4,17 +4,20 @@ import { Product } from '../product/product.page';
 import { AlertController } from '@ionic/angular';
 import { SQliteService } from '../services/sqlite.service';
 import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Board } from '../board/board.page';
 
 export interface Order {
   id: string;
   orderNum: number;
+  boardNum: number;
   userName: string;
   orderDate: string;
   totalPrice: number;
   status: string;
 }
 
-export interface detailOrder {
+export interface DetailOrder {
   idDetail: number;
   productCode: number;
   orderNum: number;
@@ -28,28 +31,46 @@ export interface detailOrder {
   styleUrls: ['./order.page.scss'],
 })
 export class OrderPage implements OnInit {
-
-  allProducts : Product[] = [];
+  allProducts: Product[] = [];
   filteredProducts: Product[] = [];
+  allBoards: Board[] = [];
   searchQuery: string = '';
   find: boolean = false;
-  newOrder: Order = {
-    id : '',
-    orderNum : 0,
-    userName : '',
-    orderDate : '',
-    totalPrice : 0,
-    status : '',
-  };
+  orderForm!: FormGroup;
+  loggedInUser: string = sessionStorage.getItem('userId') || "sinUser";
 
-  constructor(private apiService: ApiService,
-              private sqliteService: SQliteService,
-              private alertController: AlertController,
-              private router: Router
-  ) { }
+  constructor(
+    private apiService: ApiService,
+    private sqliteService: SQliteService,
+    private alertController: AlertController,
+    private router: Router,
+    private formBuilder: FormBuilder
+  ) {}
 
   ngOnInit() {
     this.getProductInit();
+    this.getBoards();
+
+    this.orderForm = this.formBuilder.group({
+      id: ['', []],
+      orderNum: [{ value: this.generateOrderNum(), disabled: true }, [Validators.required]],
+      boardNum: ['', [Validators.required]],
+      userName: [this.loggedInUser, [Validators.required]],
+      orderDate: [new Date().toISOString().substring(0, 10), [Validators.required]],
+      totalPrice: ['', [Validators.required, Validators.min(1)]],
+      status: ['', [Validators.required]]
+    });
+  }
+
+  getBoards() {
+    this.apiService.getBoard().subscribe(
+      (data: Board[]) => {
+        this.allBoards = data;
+      },
+      (error) => {
+        console.error('Error al traer las mesas:', error);
+      }
+    );
   }
 
   getProductInit() {
@@ -57,13 +78,10 @@ export class OrderPage implements OnInit {
       (data: Product[]) => {
         this.allProducts = data.map(product => ({
           ...product,
-          showOptions: false // Inicializar showOptions en false
+          showOptions: false
         }));
-        this.allProducts = data;
-        this.filteredProducts = data;  // Al principio, no hay filtro, así que mostramos todos los productos
-        // Controlar si se encontraron productos
+        this.filteredProducts = this.allProducts;
         this.find = this.filteredProducts.length > 0;
-
       },
       (error) => {
         console.error('Error al traer los productos:', error);
@@ -78,64 +96,37 @@ export class OrderPage implements OnInit {
   }
 
   async onSaveOrder() {
-    const newOrderNum = this.generateOrderNum();
-    this.newOrder.orderNum = newOrderNum
-    const createOrder = this.sqliteService.addOrder(this.newOrder);
-      if(typeof(createOrder) == 'number'){
-        const alert = await this.alertController.create({
+    if (this.orderForm.valid) {
+      const orderData: Order = {
+        ...this.orderForm.getRawValue(),
+        orderNum: this.generateOrderNum(),
+        userName: this.loggedInUser
+      };
+
+      const createOrderResult = await this.sqliteService.addOrder(orderData);
+      if (typeof createOrderResult === 'number') {
+        const successAlert = await this.alertController.create({
           header: 'Orden Creada',
-          message: 'La orden' + this.newOrder.orderNum + ' ha sido creado con éxito.',
-          buttons: [
-            {
-              text: 'Aceptar'
-            }
-          ],
+          message: `La orden ${orderData.orderNum} ha sido creada con éxito.`,
+          buttons: ['Aceptar']
         });
-
-        await alert.present();
-      }else{
-        console.error('Error al añadir la orden', this.newOrder.orderNum);
-        const alert = await this.alertController.create({
+        await successAlert.present();
+        this.router.navigate(['/orders']); // Redirecciona después de guardar el pedido
+      } else {
+        const errorAlert = await this.alertController.create({
           header: 'Error de Orden',
-          message: 'Error al añadir la Orden' + this.newOrder.orderNum,
-          buttons: [
-            {
-              text: 'Aceptar'             
-            }
-          ],
+          message: `Error al añadir la Orden ${orderData.orderNum}`,
+          buttons: ['Aceptar']
         });
+        await errorAlert.present();
       }
-    
-  }
-
-  async onAddOrderDetail() {
-    const newOrderNum = this.generateOrderNum();
-    this.newOrder.orderNum = newOrderNum
-    const createOrder = this.sqliteService.addOrder(this.newOrder);
-      if(typeof(createOrder) == 'number'){
-        const alert = await this.alertController.create({
-          header: 'Orden Creada',
-          message: 'La orden' + this.newOrder.orderNum + ' ha sido creado con éxito.',
-          buttons: [
-            {
-              text: 'Aceptar'
-            }
-          ],
-        });
-
-        await alert.present();
-      }else{
-        console.error('Error al añadir la orden', this.newOrder.orderNum);
-        const alert = await this.alertController.create({
-          header: 'Error de Orden',
-          message: 'Error al añadir la Orden' + this.newOrder.orderNum,
-          buttons: [
-            {
-              text: 'Aceptar'             
-            }
-          ],
-        });
-      }
-    
+    } else {
+      const invalidAlert = await this.alertController.create({
+        header: 'Formulario Incompleto',
+        message: 'Por favor completa todos los campos obligatorios.',
+        buttons: ['Aceptar']
+      });
+      await invalidAlert.present();
+    }
   }
 }

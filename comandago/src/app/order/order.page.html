@@ -3,23 +3,62 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Order</ion-title>
+    <ion-title>Crear Pedido</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-button (click)="onSaveOrder()">Crear pedido</ion-button>
-<ion-item>
-  <ion-select label="Seleccione Producto" interface="action-sheet" label-placement="floating" required>
-    <ion-select>
-      <ion-select-option *ngFor="let product of allProducts" [value]="product.id">
-        {{ product.productName }}
-      </ion-select-option>
-    </ion-select>
-  </ion-select>
-  <div>
-    <ion-button type="buttom" color="primary">Añadir</ion-button>
+<ion-content>
+  <div class="container">
+    <form [formGroup]="orderForm" (ngSubmit)="onSaveOrder()">
+      <!-- Número de Pedido -->
+      <ion-item>
+        <ion-label position="floating">Número de Pedido</ion-label>
+        <ion-input formControlName="orderNum" type="number" required></ion-input>
+      </ion-item>
+
+      <!-- Usuario (Autocompletado) -->
+      <ion-item>
+        <ion-label position="floating">Usuario</ion-label>
+        <ion-input [value]="loggedInUser" readonly></ion-input>
+      </ion-item>
+
+      <!-- Número de Mesa -->
+      <ion-item>
+        <ion-label position="floating">Mesa</ion-label>
+        <ion-select formControlName="boardNum" interface="popover" placeholder="Selecciona una mesa">
+          <ion-select-option *ngFor="let board of allBoards" [value]="board.boardnum">
+            Mesa {{ board.boardnum }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Fecha del Pedido -->
+      <ion-item>
+        <ion-label position="floating">Fecha del Pedido</ion-label>
+        <ion-datetime formControlName="orderDate" displayFormat="DD-MM-YYYY" required></ion-datetime>
+      </ion-item>
+
+      <!-- Precio Total -->
+      <ion-item>
+        <ion-label position="floating">Precio Total</ion-label>
+        <ion-input formControlName="totalPrice" type="number" required></ion-input>
+      </ion-item>
+
+      <!-- Estado del Pedido -->
+      <ion-item>
+        <ion-label position="floating">Estado</ion-label>
+        <ion-select formControlName="status" interface="action-sheet">
+          <ion-select-option value="Pendiente">Pendiente</ion-select-option>
+          <ion-select-option value="En Proceso">En Proceso</ion-select-option>
+          <ion-select-option value="Completado">Completado</ion-select-option>
+          <ion-select-option value="Cancelado">Cancelado</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Botón Guardar -->
+      <div class="submit-button">
+        <ion-button type="submit" color="success" expand="block" [disabled]="orderForm.invalid">Guardar Pedido</ion-button>
+      </div>
+    </form>
   </div>
-</ion-item>
-
-
-<ion-button type="submit" color="primary">Comfirmar pedido</ion-button>
+</ion-content>
