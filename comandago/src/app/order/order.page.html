@@ -9,7 +9,7 @@
 
 <ion-content>
   <div class="container">
-    <form [formGroup]="orderForm" (ngSubmit)="onSaveOrder()">
+    <form *ngIf="orderCreate === 0" [formGroup]="orderForm" (ngSubmit)="onSaveOrder()">
       <!-- Número de Pedido -->
       <ion-item>
         <ion-label position="floating">Número de Pedido</ion-label>
@@ -19,7 +19,7 @@
       <!-- Usuario (Autocompletado) -->
       <ion-item>
         <ion-label position="floating">Usuario</ion-label>
-        <ion-input [value]="loggedInUser" readonly></ion-input>
+        <ion-input formControlName="userName" type="number" readonly></ion-input>
       </ion-item>
 
       <!-- Número de Mesa -->
@@ -35,14 +35,14 @@
       <!-- Fecha del Pedido -->
       <ion-item>
         <ion-label position="floating">Fecha del Pedido</ion-label>
-        <ion-datetime formControlName="orderDate" displayFormat="DD-MM-YYYY" required></ion-datetime>
+        <ion-input formControlName="orderDate" displayFormat="DD-MM-YYYY" readonly></ion-input>
       </ion-item>
 
       <!-- Precio Total -->
-      <ion-item>
+      <!-- <ion-item>
         <ion-label position="floating">Precio Total</ion-label>
         <ion-input formControlName="totalPrice" type="number" required></ion-input>
-      </ion-item>
+      </ion-item> -->
 
       <!-- Estado del Pedido -->
       <ion-item>
@@ -57,7 +57,7 @@
 
       <!-- Botón Guardar -->
       <div class="submit-button">
-        <ion-button type="submit" color="success" expand="block" [disabled]="orderForm.invalid">Guardar Pedido</ion-button>
+        <ion-button type="submit" color="success" expand="block" [disabled]="orderForm.invalid">Crear Pedido</ion-button>
       </div>
     </form>
   </div>

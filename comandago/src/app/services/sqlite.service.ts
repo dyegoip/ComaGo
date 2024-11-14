@@ -211,7 +211,7 @@ export class SQliteService {
 
   async addOrder(order: Order): Promise<number> {
     if (this.dbInstance) {
-      const sql = `INSERT INTO ORDER (IDORDER, ORDERNUM, BOARDNUM, USERNAME, ORDERDATE, TOTALPRICE, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+      const sql = `INSERT INTO \`ORDER\` (IDORDER, ORDERNUM, BOARDNUM, USERNAME, ORDERDATE, TOTALPRICE, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?)`;
       const values = [order.id, order.orderNum, order.boardNum, order.userName, order.orderDate, order.totalPrice, order.status];
       const res = await this.dbInstance.executeSql(sql, values);
       return res.insertId;
@@ -223,7 +223,7 @@ export class SQliteService {
 
   async delOrder(orderNum: number): Promise<number> {
     if (this.dbInstance) {
-      const sql = `DELETE FROM ORDER WHERE ORDERNUM = ?`;
+      const sql = `DELETE FROM \`ORDER\` WHERE ORDERNUM = ?`;
       const values = [orderNum];
       const res = await this.dbInstance.executeSql(sql, values);
       
@@ -235,7 +235,7 @@ export class SQliteService {
 
   async getOrderByorderNumber(orderNum: number): Promise<Order | null> {
     if (this.dbInstance) {
-      const sql = `SELECT * FROM ORDER WHERE USERNAME = ?`;
+      const sql = `SELECT * FROM \`ORDER\` WHERE USERNAME = ?`;
       const values = [orderNum];
       const res = await this.dbInstance.executeSql(sql, values);
       if (res.rows.length > 0) {

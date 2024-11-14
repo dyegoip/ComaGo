@@ -3,7 +3,7 @@ import { ApiService } from '../services/api.service';
 import { Product } from '../product/product.page';
 import { AlertController } from '@ionic/angular';
 import { SQliteService } from '../services/sqlite.service';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Board } from '../board/board.page';
 
@@ -38,6 +38,7 @@ export class OrderPage implements OnInit {
   find: boolean = false;
   orderForm!: FormGroup;
   loggedInUser: string = sessionStorage.getItem('userId') || "sinUser";
+  orderCreate: number = 0;
 
   constructor(
     private apiService: ApiService,
@@ -51,15 +52,26 @@ export class OrderPage implements OnInit {
     this.getProductInit();
     this.getBoards();
 
+    const idOrder = this.generateOrderNum();
+
+    const today = this.formatDate(new Date());
+
     this.orderForm = this.formBuilder.group({
-      id: ['', []],
-      orderNum: [{ value: this.generateOrderNum(), disabled: true }, [Validators.required]],
+      id: [{ value: idOrder, disabled: true }, [Validators.required]],
+      orderNum: [{ value: idOrder, disabled: true }, [Validators.required]],
       boardNum: ['', [Validators.required]],
       userName: [this.loggedInUser, [Validators.required]],
-      orderDate: [new Date().toISOString().substring(0, 10), [Validators.required]],
-      totalPrice: ['', [Validators.required, Validators.min(1)]],
+      orderDate: [today, [Validators.required]],
+      totalPrice: [{value: 0}, [Validators.required, Validators.min(1)]],
       status: ['', [Validators.required]]
     });
+  }
+
+  private formatDate(date: Date): string {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses comienzan desde 0
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
   }
 
   getBoards() {
@@ -97,17 +109,14 @@ export class OrderPage implements OnInit {
 
   async onSaveOrder() {
     if (this.orderForm.valid) {
-      const orderData: Order = {
-        ...this.orderForm.getRawValue(),
-        orderNum: this.generateOrderNum(),
-        userName: this.loggedInUser
-      };
+      
+      const newOrder = this.orderForm.value;
 
-      const createOrderResult = await this.sqliteService.addOrder(orderData);
+      const createOrderResult = await this.sqliteService.addOrder(newOrder);
       if (typeof createOrderResult === 'number') {
         const successAlert = await this.alertController.create({
           header: 'Orden Creada',
-          message: `La orden ${orderData.orderNum} ha sido creada con éxito.`,
+          message: `La orden ${newOrder.orderNum} ha sido creada con éxito.`,
           buttons: ['Aceptar']
         });
         await successAlert.present();
@@ -115,7 +124,7 @@ export class OrderPage implements OnInit {
       } else {
         const errorAlert = await this.alertController.create({
           header: 'Error de Orden',
-          message: `Error al añadir la Orden ${orderData.orderNum}`,
+          message: `Error al añadir la Orden ${newOrder.orderNum}`,
           buttons: ['Aceptar']
         });
         await errorAlert.present();
