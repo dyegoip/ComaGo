@@ -15,14 +15,6 @@
       "email": "seba@duoc.cl",
       "rol": "1",
       "password": "123456"
-    },
-    {
-      "id": 177335,
-      "userName": "sfuentes",
-      "fullName": "Sfuentes sfuentes",
-      "email": "sfuentes@sfuentes.cl",
-      "rol": "2",
-      "password": "sfuentes.1234"
     }
   ],
   "products": [
@@ -42,7 +34,7 @@
       "price": 5600,
       "stock": 10,
       "active": false,
-      "type": "Guarnicion"
+      "type": "Plato"
     },
     {
       "id": "3",
@@ -51,7 +43,7 @@
       "price": 1500,
       "stock": 50,
       "active": true,
-      "type": "Liquidos"
+      "type": "Bebestible"
     },
     {
       "id": "181245",
@@ -60,15 +52,79 @@
       "price": 2500,
       "stock": 30,
       "active": true,
-      "type": "Liquidos"
+      "type": "Bebestible"
     },
     {
       "id": "4",
       "productName": "Tiramissu",
+      "productCode": "PO-001",
       "price": 4500,
       "stock": 30,
       "active": "false",
       "type": "Postre"
+    },
+    {
+      "id": "447631",
+      "productName": "Lechuga",
+      "productCode": "EN-001",
+      "price": 500,
+      "stock": 20,
+      "active": true,
+      "type": "Ensalada"
+    },
+    {
+      "id": "153499",
+      "productName": "Tomate",
+      "productCode": "EN-002",
+      "price": 500,
+      "stock": 20,
+      "active": "false",
+      "type": "Ensalada"
+    },
+    {
+      "id": "180897",
+      "productName": "Pollo Asado",
+      "productCode": "GU-001",
+      "price": 2500,
+      "stock": 20,
+      "active": "false",
+      "type": "Plato"
+    },
+    {
+      "id": "116336",
+      "productName": "Carne al Jugo",
+      "productCode": "GU-002",
+      "price": 3000,
+      "stock": 15,
+      "active": "false",
+      "type": "Plato"
+    },
+    {
+      "id": "166351",
+      "productName": "Pescado Frito",
+      "productCode": "GU-003",
+      "price": 3000,
+      "stock": 20,
+      "active": "false",
+      "type": "Plato"
+    },
+    {
+      "id": "154557",
+      "productName": "Arroz",
+      "productCode": "GU-002",
+      "price": 700,
+      "stock": 40,
+      "active": "false",
+      "type": "Guarnicion"
+    },
+    {
+      "id": "140433",
+      "productName": "Arroz",
+      "productCode": "GU-003",
+      "price": 700,
+      "stock": 30,
+      "active": "false",
+      "type": "Guarnicion"
     }
   ],
   "order": [

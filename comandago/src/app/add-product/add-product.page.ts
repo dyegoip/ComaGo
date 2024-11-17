@@ -61,7 +61,6 @@ export class AddProductPage implements OnInit {
 
       this.apiService.addProduct(newProduct).subscribe(async response => {
         console.log('Producto añadido exitosamente', response);
-
         const alert = await this.alertController.create({
           header: 'Producto Creado',
           message: 'El Producto ' + newProduct.productName + ' ha sido creado con éxito.',
@@ -74,6 +73,9 @@ export class AddProductPage implements OnInit {
             }
           ],
         });
+
+        this.productForm.reset();
+        this.idRandom = this.appComponent.getRandomID();
 
         await alert.present();
 

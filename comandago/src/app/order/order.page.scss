@@ -1,0 +1,88 @@
+.order-summary-container {
+    margin-top: 20px; /* Ajusta el margen según sea necesario */
+  }
+  
+  .order-summary h2 {
+    margin-bottom: 10px; /* Espaciado entre el título y el contenido */
+  }
+  
+  ion-card {
+    margin-bottom: 15px; /* Espaciado entre los conjuntos de resumen */
+  }
+  
+.bg-image {
+  background-image: url(/src/assets/icon/png-transparent-smiling-quokka-animals-quokkas.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+
+.input {
+  display: flex;
+  margin: 0;
+  align-items: center;
+  width: 100%;
+  max-width: 350px;
+}
+
+.container-father {
+  margin-top: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+  max-width: 350px;
+}
+
+.button {
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 15px;
+}
+
+.justificar {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.a-center{
+  display: block;
+  text-align: center;
+}
+
+.password ion-button {
+  flex: 1;
+  margin: 20px 10px 0px 10px;
+}
+.logo-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  max-width: 150px;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 600px) {
+  .input {
+    max-width: 100%;
+  }
+
+  .container-father {
+    margin: 20px auto;
+    width: 90%;
+  }
+
+  .button {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .password ion-button {
+    width: 100%;
+    margin: 20px 10px 50px 10px;
+  }
+}

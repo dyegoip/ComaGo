@@ -7,9 +7,10 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="container">
-    <form *ngIf="orderCreate === 0" [formGroup]="orderForm" (ngSubmit)="onSaveOrder()">
+<ion-content [fullscreen]="true">
+  <div class="container-father">
+    <!-- Formulario para crear el pedido -->
+    <form *ngIf="showFormOrder" [formGroup]="orderForm" (ngSubmit)="onSaveOrder()">
       <!-- Número de Pedido -->
       <ion-item>
         <ion-label position="floating">Número de Pedido</ion-label>
@@ -38,27 +39,84 @@
         <ion-input formControlName="orderDate" displayFormat="DD-MM-YYYY" readonly></ion-input>
       </ion-item>
 
-      <!-- Precio Total -->
-      <!-- <ion-item>
-        <ion-label position="floating">Precio Total</ion-label>
-        <ion-input formControlName="totalPrice" type="number" required></ion-input>
-      </ion-item> -->
-
       <!-- Estado del Pedido -->
       <ion-item>
         <ion-label position="floating">Estado</ion-label>
-        <ion-select formControlName="status" interface="action-sheet">
-          <ion-select-option value="Pendiente">Pendiente</ion-select-option>
-          <ion-select-option value="En Proceso">En Proceso</ion-select-option>
-          <ion-select-option value="Completado">Completado</ion-select-option>
-          <ion-select-option value="Cancelado">Cancelado</ion-select-option>
-        </ion-select>
+        <ion-input formControlName="status" readonly></ion-input>
       </ion-item>
 
-      <!-- Botón Guardar -->
+      <!-- Botón Guardar Pedido -->
       <div class="submit-button">
         <ion-button type="submit" color="success" expand="block" [disabled]="orderForm.invalid">Crear Pedido</ion-button>
       </div>
     </form>
+
+    <!-- Formulario para añadir productos -->
+    <form *ngIf="!showFormOrder" [formGroup]="detailOrderForm">
+      <ion-item>
+        <ion-label>Plato</ion-label>
+        <ion-select formControlName="plato" interface="action-sheet">
+          <ion-select-option *ngFor="let product of platos" [value]="product">{{ product.productName }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label>Guarnición</ion-label>
+        <ion-select formControlName="guarnicion" interface="action-sheet">
+          <ion-select-option *ngFor="let product of guarniciones" [value]="product">{{ product.productName }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label>Ensalada</ion-label>
+        <ion-select formControlName="ensalada" interface="action-sheet">
+          <ion-select-option *ngFor="let product of ensaladas" [value]="product">{{ product.productName }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label>Bebestible</ion-label>
+        <ion-select formControlName="bebestible" interface="action-sheet">
+          <ion-select-option *ngFor="let product of bebestibles" [value]="product">{{ product.productName }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label>Postre</ion-label>
+        <ion-select formControlName="postre" interface="action-sheet">
+          <ion-select-option *ngFor="let product of postres" [value]="product">{{ product.productName }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+  
+      <ion-button (click)="addProductsToOrder(createdOrderId)" [disabled]="!orderForm.valid">Añadir al Pedido</ion-button>
+    </form>
+
+    <div class="order-summary-container">
+      <div *ngIf="displayedOrders.length > 0" class="order-summary">
+        <h2>Resumen del Pedido</h2>
+        <ion-card *ngFor="let group of displayedOrders; let i = index">
+          <ion-card-header>
+            <ion-card-title>Conjunto {{ i + 1 }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label><strong>Plato:</strong> {{ group.plato || 'No seleccionado' }}</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label><strong>Guarnición:</strong> {{ group.guarnicion || 'No seleccionado' }}</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label><strong>Ensalada:</strong> {{ group.ensalada || 'No seleccionado' }}</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label><strong>Bebestible:</strong> {{ group.bebestible || 'No seleccionado' }}</ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label><strong>Postre:</strong> {{ group.postre || 'No seleccionado' }}</ion-label>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
   </div>
 </ion-content>

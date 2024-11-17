@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
 import { User } from '../user/user.page';
 import { Product } from '../product/product.page';
-import { Order } from '../order/order.page';
+import { DetailOrder, Order } from '../order/order.page';
 import { Board } from '../board/board.page';
 
 @Injectable({
@@ -258,11 +258,11 @@ export class SQliteService {
     }
   }
 
-  async addOrderDetail(order: Order): Promise<number> {
+  async addOrderDetail(orderdetail: DetailOrder): Promise<number> {
 
     if (this.dbInstance) {
       const sql = `INSERT INTO ORDERDETAIL (IDDETAIL, PRODUCTCODE, ORDERNUM, QUANTITY, PRICE) VALUES (?, ?, ?, ?, ?)`;
-      const values = [order.orderNum, order.userName, order.orderDate, order.totalPrice, order.status];
+      const values = [orderdetail.idDetail, orderdetail.productCode, orderdetail.orderNum, orderdetail.quantity, orderdetail.price];
       const res = await this.dbInstance.executeSql(sql, values);
       return res.insertId;
     } else {
