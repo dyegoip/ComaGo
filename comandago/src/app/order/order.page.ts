@@ -18,7 +18,7 @@ export interface Order {
 }
 
 export interface DetailOrder {
-  idDetail: number;
+  idDetail: string;
   productCode: number;
   orderNum: number;
   quantity: number;
@@ -39,9 +39,10 @@ export class OrderPage implements OnInit {
   find: boolean = false;
   orderForm!: FormGroup;
   detailOrderForm!: FormGroup;
-  loggedInUser: string = sessionStorage.getItem('userId') || "sinUser";
+  loggedInUser: string = sessionStorage.getItem('userName') || "sinUser";
   showFormOrder: boolean = true;
   createdOrderId: number = 0;
+  indexConjunto: number = 1;
 
   platos: Product[] = [];
   guarniciones: Product[] = [];
@@ -100,8 +101,10 @@ export class OrderPage implements OnInit {
       (data: Product[]) => {
         this.allProducts = data.map((product) => ({
           ...product,
-          showOptions: false, // Inicializar showOptions en false
+          showOptions: false,
         }));
+
+        this.allProducts = this.allProducts.filter((p) => p.active === true);
 
         this.platos = this.allProducts.filter((p) => p.type === 'Plato');
         this.guarniciones = this.allProducts.filter((p) => p.type === 'Guarnicion');        
@@ -189,27 +192,31 @@ export class OrderPage implements OnInit {
     const detailsToAdd = [];
 
     const group: { [key: string]: string } = {};
+    let index = 1;
 
     for (const productType in selectedProducts) {
       const selectedProduct = selectedProducts[productType];
       if (selectedProduct) {
         detailsToAdd.push({
-          idDetail: this.generateRamdonId(),
+          idDetail: orderNum.toString() + 
+          "-" + this.indexConjunto.toString().padStart(2, '0') + 
+          "-" + index.toString().padStart(2, '0'),
           productCode: selectedProduct.productCode,
           orderNum: orderNum,
           quantity: 1,
           price: selectedProduct.price,
         });
-
+        index++;
         group[productType] = selectedProduct.productName;
       }
     }
-
     for (let detail of detailsToAdd) {
-      await this.sqliteService.addOrderDetail(detail);
+      await this.sqliteService.addOrderDetail(detail);      
     }
 
     this.displayedOrders.push(group);
+
+    this.indexConjunto++;
 
     const successAlert = await this.alertController.create({
       header: 'Detalles añadidos',

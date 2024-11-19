@@ -161,7 +161,8 @@ export class LoginPage implements OnInit {
                       handler: () => {
                         const navigationExtras: NavigationExtras = {
                           state: {
-                            userId: userId
+                            userId: userId,
+                            userName: userApi
                           }
                         };
                         this.router.navigate(['/home'], navigationExtras).then(() => {

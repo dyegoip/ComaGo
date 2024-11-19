@@ -14,7 +14,7 @@ import { SQliteService } from './services/sqlite.service';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [AppRoutingModule, BrowserModule, IonicModule.forRoot(), RouterModule, HttpClientModule, CommonModule, FormsModule],
+  imports: [AppRoutingModule, BrowserModule, IonicModule.forRoot({rippleEffect: false, mode: 'md'}), RouterModule, HttpClientModule, CommonModule, FormsModule],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, provideAnimationsAsync(), SQLite,  SQliteService],
   bootstrap: [AppComponent],
 })

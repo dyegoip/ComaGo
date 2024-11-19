@@ -33,7 +33,7 @@
       "productCode": "PL-002",
       "price": 5600,
       "stock": 10,
-      "active": false,
+      "active": true,
       "type": "Plato"
     },
     {
@@ -60,7 +60,7 @@
       "productCode": "PO-001",
       "price": 4500,
       "stock": 30,
-      "active": "false",
+      "active": false,
       "type": "Postre"
     },
     {
@@ -78,7 +78,7 @@
       "productCode": "EN-002",
       "price": 500,
       "stock": 20,
-      "active": "false",
+      "active": false,
       "type": "Ensalada"
     },
     {
@@ -87,7 +87,7 @@
       "productCode": "GU-001",
       "price": 2500,
       "stock": 20,
-      "active": "false",
+      "active": false,
       "type": "Plato"
     },
     {
@@ -96,7 +96,7 @@
       "productCode": "GU-002",
       "price": 3000,
       "stock": 15,
-      "active": "false",
+      "active": false,
       "type": "Plato"
     },
     {
@@ -105,7 +105,7 @@
       "productCode": "GU-003",
       "price": 3000,
       "stock": 20,
-      "active": "false",
+      "active": false,
       "type": "Plato"
     },
     {
@@ -114,17 +114,17 @@
       "productCode": "GU-002",
       "price": 700,
       "stock": 40,
-      "active": "false",
+      "active": false,
       "type": "Guarnicion"
     },
     {
-      "id": "140433",
-      "productName": "Arroz",
-      "productCode": "GU-003",
-      "price": 700,
-      "stock": 30,
-      "active": "false",
-      "type": "Guarnicion"
+      "id": "141999",
+      "productName": "Jalea",
+      "productCode": "PO-002",
+      "price": 500,
+      "stock": 20,
+      "active": true,
+      "type": "Postre"
     }
   ],
   "order": [

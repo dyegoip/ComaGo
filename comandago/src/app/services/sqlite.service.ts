@@ -205,6 +205,43 @@ export class SQliteService {
       throw new Error('Database is not initialized');
     }
   }
+
+  //Funciones Productos
+
+  async addProduct(product: any): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `
+        INSERT INTO PRODUCTS (IDPRODUCT, PRODUCTNAME, PRODUCTCODE, PRICE, STOCK, ACTIVE, TYPEPRODUCT)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `;
+      const values = [
+        product.id,
+        product.productName,
+        product.productCode,
+        product.price,
+        product.stock,
+        product.active ? 1 : 0,
+        product.typeProduct
+      ];
+      const res = await this.dbInstance.executeSql(sql, values);
+      console.log('Producto guardado:', JSON.stringify(res));
+      return res.insertId;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+  
+  async delProduct(productCode: string): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `DELETE FROM PRODUCTS WHERE PRODUCTCODE = ?`;
+      const values = [productCode];
+      const res = await this.dbInstance.executeSql(sql, values);
+      console.log('Productos eliminados:', res.rowsAffected);
+      return res.rowsAffected;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
   
   
   // Function Order//
