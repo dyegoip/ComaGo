@@ -14,7 +14,7 @@
       <!-- Número de Pedido -->
       <ion-item>
         <ion-label position="floating">Número de Pedido</ion-label>
-        <ion-input formControlName="orderNum" type="number" required></ion-input>
+        <ion-input formControlName="orderNum" type="number" readonly></ion-input>
       </ion-item>
 
       <!-- Usuario (Autocompletado) -->
@@ -116,7 +116,7 @@
             </ion-item>
           </ion-card-content>
         </ion-card>
-        <ion-button (click)="confirmOrder()">Confirmar Pedido</ion-button>
+        <ion-button (click)="confirmOrder(createdOrderId)">Confirmar Pedido</ion-button>
       </div>
     </div>
   </div>

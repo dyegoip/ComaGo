@@ -152,6 +152,7 @@ export class LoginPage implements OnInit {
               if (userValue == userApi && passValue == passApi) {
                 sessionStorage.setItem('isAuthenticated', 'true');
                 sessionStorage.setItem('userId', userId);
+                sessionStorage.setItem('userName', userApi);
                 const alert = await this.alertController.create({
                   header: 'Login Exitoso',
                   message: 'Bienvenido/a ' + this.userApi.fullName,

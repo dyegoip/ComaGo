@@ -227,4 +227,109 @@ export class OrderPage implements OnInit {
 
     this.detailOrderForm.reset();
   }
+
+  async confirmOrder(orderNum: number) {
+    try {
+      // Obtener la orden y sus detalles de SQLite
+      const order = await this.sqliteService.getOrderByorderNumber(orderNum);
+      const orderDetails = await this.sqliteService.getOrderDetailsByOrderNum(orderNum);
+  
+      if (!order) {
+        console.error('La orden no existe en SQLite.');
+        return;
+      }
+  
+      if (!orderDetails || orderDetails.length === 0) {
+        console.error('No hay detalles asociados a esta orden.');
+        return;
+      }
+
+      order.status = "Preparacion";
+  
+      // Crear la orden en la API
+      await this.apiService.addOrder(order).subscribe(
+        async (response) => {
+          console.log('Orden creada exitosamente en la API.');
+  
+          // Crear cada detalle de la orden en la API
+          const promises = orderDetails.map((detail) =>
+            this.apiService.addOrderDetail(detail).toPromise()
+          );
+  
+          try {
+            // Esperar a que todos los detalles sean creados
+            await Promise.all(promises);
+            console.log('Todos los detalles de la orden creados exitosamente en la API.');
+  
+            // Eliminar la orden y los detalles de SQLite después de sincronización
+            await this.sqliteService.delOrder(orderNum);
+            console.log('Orden eliminada de SQLite después de sincronización.');
+  
+            await this.sqliteService.delOrderDetail(orderNum);
+            console.log('Detalles de la orden eliminados de SQLite después de sincronización.');
+  
+            // Mostrar alerta de éxito
+            const alert = await this.alertController.create({
+              header: 'Pedido confirmado',
+              message: `La Orden #${orderNum} ha sido confirmada.`,
+              buttons: [
+                {
+                  text: 'Aceptar',
+                  handler: () => {
+                    this.router.navigate(['/orders']).then(() => {
+                      window.location.reload();
+                    });
+                  },
+                },
+              ],
+            });
+            await alert.present();
+          } catch (detailsError) {
+            console.error('Error al sincronizar los detalles de la orden:', detailsError);
+  
+            const alert = await this.alertController.create({
+              header: 'Error de Sincronización',
+              message: `La Orden #${orderNum} fue creada, pero hubo un problema al sincronizar los detalles. Por favor, inténtelo más tarde.`,
+              buttons: [
+                {
+                  text: 'Aceptar',
+                  handler: () => {},
+                },
+              ],
+            });
+            await alert.present();
+          }
+        },
+        async (orderError) => {
+          console.error('Error al sincronizar la orden en la API:', orderError);
+  
+          const alert = await this.alertController.create({
+            header: 'Error de Sincronización',
+            message: 'La Orden no se pudo sincronizar con la API. Por favor, inténtelo más tarde.',
+            buttons: [
+              {
+                text: 'Aceptar',
+                handler: () => {},
+              },
+            ],
+          });
+          await alert.present();
+        }
+      );
+    } catch (error) {
+      console.error('Error al procesar la sincronización:', error);
+  
+      const alert = await this.alertController.create({
+        header: 'Error de Sincronización',
+        message: 'Ocurrió un error inesperado. Por favor, inténtelo más tarde.',
+        buttons: [
+          {
+            text: 'Aceptar',
+            handler: () => {},
+          },
+        ],
+      });
+      await alert.present();
+    }
+  }
 }

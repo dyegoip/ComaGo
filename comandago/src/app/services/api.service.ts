@@ -12,7 +12,8 @@ import { Board } from '../board/board.page';
 export class ApiService {
   //private apiUrl = 'http://localhost:3000';
   //private apiUrl = 'http://192.168.1.93:3000';
-  private apiUrl = 'http://192.168.91.20:3000';
+  //private apiUrl = 'http://192.168.91.20:3000';
+  private apiUrl = 'http://172.16.131.197:3000';
   //private apiUrl = 'http://192.168.100.74:3000';
 
   private apiConnectionStatus = new BehaviorSubject<boolean>(false);
@@ -148,6 +149,18 @@ export class ApiService {
 
   editOrder(order: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/order/${order.id}`, order);
+  }
+
+  addOrderDetail(orderdetail: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/orderdetail/`, orderdetail);
+  }
+
+  deleteOrderDetail(orderdetailId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/orderdetail/${orderdetailId}`);
+  }
+
+  editOrderDetail(orderdetail: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/orderdetail/${orderdetail.id}`, orderdetail);
   }
 
   //Funciones Api Mesa//

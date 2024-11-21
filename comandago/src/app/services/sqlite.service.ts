@@ -83,7 +83,6 @@ export class SQliteService {
     }
   }
 
-
   async addUser(user: User): Promise<number> {
     //const salt = await bcrypt.genSalt(10);
     //user.password = await bcrypt.hash(user.password, salt);
@@ -111,7 +110,6 @@ export class SQliteService {
     }
   }
   
-
   async getUserByuserName(username: string): Promise<User | null> {
     if (this.dbInstance) {
       const sql = `SELECT * FROM USER WHERE USERNAME = ?`;
@@ -207,7 +205,6 @@ export class SQliteService {
   }
 
   //Funciones Productos
-
   async addProduct(product: any): Promise<number> {
     if (this.dbInstance) {
       const sql = `
@@ -241,11 +238,9 @@ export class SQliteService {
     } else {
       throw new Error('Database is not initialized');
     }
-  }
-  
+  } 
   
   // Function Order//
-
   async addOrder(order: Order): Promise<number> {
     if (this.dbInstance) {
       const sql = `INSERT INTO \`ORDER\` (IDORDER, ORDERNUM, BOARDNUM, USERNAME, ORDERDATE, TOTALPRICE, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?)`;
@@ -288,7 +283,7 @@ export class SQliteService {
 
         };
       } else {
-        return null;  // No se encontró un administrador con ese correo
+        return null;
       }
     } else {
       throw new Error('Database is not initialized');
@@ -306,6 +301,50 @@ export class SQliteService {
       throw new Error('Database is not initialized');
     }
   }
+
+  async getOrderDetailsByOrderNum(orderNum: number): Promise<DetailOrder[] | null > {
+  if (this.dbInstance) {
+    const sql = `SELECT * FROM ORDERDETAIL WHERE ORDERNUM = ?`;
+    const value = [orderNum]
+
+    try {
+      const res = await this.dbInstance.executeSql(sql, value);
+      if (res && res.rows && res.rows.length > 0){
+        const details: DetailOrder[] = []; 
+        for (let i = 0; i < res.rows.length; i++) {
+          const row = res.rows.item(i);
+          details.push({
+            idDetail: row.IDDETAIL,
+            productCode: row.PRODUCTCODE,
+            orderNum: row.ORDERNUM,
+            quantity: row.QUANTITY,
+            price: row.PRICE,
+          });
+        }
+        return details;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Error al consultar orderdetail ', JSON.stringify(error));
+      return null;
+    }
+  } else {
+    throw new Error('Database is not initialized');
+  }
+}
+
+async delOrderDetail(orderNum: number): Promise<number> {
+  if (this.dbInstance) {
+    const sql = `DELETE FROM ORDERDETAIL WHERE ORDERNUM = ?`;
+    const values = [orderNum];
+    const res = await this.dbInstance.executeSql(sql, values);
+    
+    return res.rowsAffected;
+  } else {
+    throw new Error('Database is not initialized');
+  }
+}
 
   //Funciones Mesa//
 
