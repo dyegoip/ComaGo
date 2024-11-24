@@ -3,6 +3,7 @@ import { Component, OnInit, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuController, NavController } from '@ionic/angular';
 import { SQliteService } from './services/sqlite.service';
+import { SplashScreen } from '@capacitor/splash-screen';
 
 //json-server --watch src/assets/dbjson/db.json --host 0.0.0.0 --port 3000 
 
@@ -20,13 +21,22 @@ export class AppComponent implements OnInit{
               private navCtrl: NavController, 
               private sqliteService: SQliteService,
               private apiService: ApiService) 
-              {this.checkAuthentication();}
+              {
+                this.checkAuthentication();
+                this.showSplash();
+              }
 
   async ngOnInit() {
     await this.initializeDatabase();
     await this.checkApiConnection();
   }
 
+  async showSplash(){
+    await SplashScreen.show({
+      autoHide: true,
+      showDuration: 3000
+    });
+  }
   async initializeDatabase() {
     try {
       await this.sqliteService.initDB(); // Inicializar la base de datos
