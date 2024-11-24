@@ -17,46 +17,37 @@ import { AppComponent } from '../app.component';
   providers: [SQliteService, ApiService]
 })
 export class HomePage implements OnInit {
-
-  isAuthenticated: boolean = false;
-  userId!: string;
+  isAuthenticated = false;
+  userId = '';
   userApi: any = {};
-  userAuth!: User;
-  newUser!: User;
-  public image: string = "";
-  random: number = 0;
+  image = '';
+  random = 0;
 
-  constructor(private router: Router, 
-              private apiService: ApiService, 
-              private menu: MenuController, 
-              private sqliteService: SQliteService, 
-              private appComponent: AppComponent) {}
+  constructor(
+    private router: Router,
+    private apiService: ApiService,
+    private menu: MenuController,
+    private sqliteService: SQliteService
+  ) {}
 
   ngOnInit() {
-
-    const navigation = this.router.getCurrentNavigation();
-    if (navigation && navigation.extras.state && navigation.extras.state['userId'] != null) {
-      this.userId = navigation.extras.state['userId'];
-    } else {
-      this.userId = sessionStorage.getItem('userId') || '';
-    }
-    
-    if (this.userId === null) {
-      console.log('No se encontraron datos de navegación ni en el sessionStorage.');
-    }
-
+    this.loadUser();
     this.isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true';
-    console.log(this.userId);
-    this.apiService.getUserById(this.userId.toString()).subscribe(
-      async (data: any) => {
-        if (data) {
-          this.userApi = data;          
-        }
+  }
+
+  private loadUser() {
+    this.userId = sessionStorage.getItem('userId') || '';
+    if (!this.userId) {
+      console.warn('No se encontró un ID de usuario.');
+      return;
+    }
+
+    this.apiService.getUserById(this.userId).subscribe(
+      (data) => {
+        this.userApi = data;
         console.log('Usuario obtenido:', this.userApi);
       },
-      (error) => {
-        console.error('Error al obtener el usuario:', error);
-      }
+      (error) => console.error('Error al obtener el usuario:', error)
     );
   }
 
@@ -69,7 +60,7 @@ export class HomePage implements OnInit {
   }
 
   logout() {
-    sessionStorage.removeItem('user');
+    sessionStorage.clear();
     this.router.navigate(['/login']);
   }
 
@@ -77,16 +68,14 @@ export class HomePage implements OnInit {
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
-      resultType: CameraResultType.Base64,
+      resultType: CameraResultType.Uri,
       source: CameraSource.Camera
     });
 
-    this.image = `data:image/jpeg;base64,${image.base64String}`; 
+    this.image = image.webPath || '';
   }
 
-  async getRamdon() {
-    this.random = await this.appComponent.getRandomID();
+  generateRandomID() {
+    this.random = Math.floor(100000 + Math.random() * 900000);
   }
-
-  
 }

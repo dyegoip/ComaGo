@@ -60,7 +60,7 @@
       "productCode": "PO-001",
       "price": 4500,
       "stock": 30,
-      "active": false,
+      "active": true,
       "type": "Postre"
     },
     {
@@ -78,7 +78,7 @@
       "productCode": "EN-002",
       "price": 500,
       "stock": 20,
-      "active": false,
+      "active": true,
       "type": "Ensalada"
     },
     {
@@ -87,7 +87,7 @@
       "productCode": "GU-001",
       "price": 2500,
       "stock": 20,
-      "active": false,
+      "active": true,
       "type": "Plato"
     },
     {
@@ -96,7 +96,7 @@
       "productCode": "GU-002",
       "price": 3000,
       "stock": 15,
-      "active": false,
+      "active": true,
       "type": "Plato"
     },
     {
@@ -105,7 +105,7 @@
       "productCode": "GU-003",
       "price": 3000,
       "stock": 20,
-      "active": false,
+      "active": true,
       "type": "Plato"
     },
     {
@@ -114,7 +114,7 @@
       "productCode": "GU-002",
       "price": 700,
       "stock": 40,
-      "active": false,
+      "active": true,
       "type": "Guarnicion"
     },
     {
@@ -129,22 +129,50 @@
   ],
   "order": [
     {
-      "id": "1",
-      "orderNum": 1,
-      "boardnum": 1,
+      "id": "606218",
+      "orderNum": 606218,
+      "boardNum": 3,
       "userName": "dpenaloza",
-      "orderDate": "10-10-2024",
-      "totalPrice": 30000,
-      "status": ""
+      "orderDate": "24-11-2024",
+      "totalPrice": 0,
+      "status": "Preparacion"
     }
   ],
   "orderdetail": [
     {
-      "id": "1",
-      "productCode": "PL-001",
-      "orderNum": 1,
+      "id": "606218-01-01",
+      "productCode": "GU-001",
+      "orderNum": 606218,
       "quantity": 1,
-      "price": 3000
+      "price": 2500
+    },
+    {
+      "id": "606218-01-02",
+      "productCode": "GU-002",
+      "orderNum": 606218,
+      "quantity": 1,
+      "price": 700
+    },
+    {
+      "id": "606218-01-03",
+      "productCode": "EN-002",
+      "orderNum": 606218,
+      "quantity": 1,
+      "price": 500
+    },
+    {
+      "id": "606218-01-04",
+      "productCode": "BE-002",
+      "orderNum": 606218,
+      "quantity": 1,
+      "price": 2500
+    },
+    {
+      "id": "606218-01-05",
+      "productCode": "PO-002",
+      "orderNum": 606218,
+      "quantity": 1,
+      "price": 500
     }
   ],
   "board": [

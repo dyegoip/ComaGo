@@ -267,19 +267,19 @@ export class SQliteService {
 
   async getOrderByorderNumber(orderNum: number): Promise<Order | null> {
     if (this.dbInstance) {
-      const sql = `SELECT * FROM \`ORDER\` WHERE USERNAME = ?`;
+      const sql = `SELECT * FROM \`ORDER\` WHERE ORDERNUM = ?`;
       const values = [orderNum];
       const res = await this.dbInstance.executeSql(sql, values);
       if (res.rows.length > 0) {
         const order = res.rows.item(0);
         return {
-          id: order.id,
-          orderNum: order.orderNum,
-          boardNum: order.boardNum,
-          userName: order.userName,
-          orderDate: order.orderDate,
-          totalPrice: order.totalPrice,
-          status: order.status
+          id: order.IDORDER,
+          orderNum: order.ORDERNUM,
+          boardNum: order.BOARDNUM,
+          userName: order.USERNAME,
+          orderDate: order.ORDERDATE,
+          totalPrice: order.TOTALPRICE,
+          status: order.STATUS
 
         };
       } else {
@@ -294,7 +294,7 @@ export class SQliteService {
 
     if (this.dbInstance) {
       const sql = `INSERT INTO ORDERDETAIL (IDDETAIL, PRODUCTCODE, ORDERNUM, QUANTITY, PRICE) VALUES (?, ?, ?, ?, ?)`;
-      const values = [orderdetail.idDetail, orderdetail.productCode, orderdetail.orderNum, orderdetail.quantity, orderdetail.price];
+      const values = [orderdetail.id, orderdetail.productCode, orderdetail.orderNum, orderdetail.quantity, orderdetail.price];
       const res = await this.dbInstance.executeSql(sql, values);
       return res.insertId;
     } else {
@@ -312,13 +312,13 @@ export class SQliteService {
       if (res && res.rows && res.rows.length > 0){
         const details: DetailOrder[] = []; 
         for (let i = 0; i < res.rows.length; i++) {
-          const row = res.rows.item(i);
+          const detail = res.rows.item(i);
           details.push({
-            idDetail: row.IDDETAIL,
-            productCode: row.PRODUCTCODE,
-            orderNum: row.ORDERNUM,
-            quantity: row.QUANTITY,
-            price: row.PRICE,
+            id: detail.IDDETAIL,
+            productCode: detail.PRODUCTCODE,
+            orderNum: detail.ORDERNUM,
+            quantity: detail.QUANTITY,
+            price: detail.PRICE,
           });
         }
         return details;

@@ -18,7 +18,7 @@ export interface Order {
 }
 
 export interface DetailOrder {
-  idDetail: string;
+  id: string;
   productCode: number;
   orderNum: number;
   quantity: number;
@@ -75,13 +75,13 @@ export class OrderPage implements OnInit {
     let today = this.formatDate(new Date());
 
     this.orderForm = this.formBuilder.group({
-      id: [{ value: idOrder, disabled: true }, [Validators.required]],
-      orderNum: [{ value: idOrder, disabled: true }, [Validators.required]],
+      id: [idOrder, [Validators.required]],
+      orderNum: [idOrder, [Validators.required]],
       boardNum: ['', [Validators.required]],
       userName: [this.loggedInUser, [Validators.required]],
       orderDate: [today, [Validators.required]],
-      totalPrice: [{ value: 0, disabled: true }, [Validators.required]],
-      status: [{ value: 'Pendiente', disabled: true }, [Validators.required]],
+      totalPrice: [0, [Validators.required]],
+      status: ['Pendiente', [Validators.required]],
     });
 
     this.detailOrderForm = this.formBuilder.group({
@@ -150,10 +150,6 @@ export class OrderPage implements OnInit {
   async onSaveOrder() {
     if (this.orderForm.valid) {
       const newOrder = this.orderForm.getRawValue();
-
-      console.log("id: " + newOrder.id);
-      console.log("price: " + newOrder.totalPrice);
-      console.log("usuario: " + newOrder.status);
       // Guardar la orden
       const createOrderResult = await this.sqliteService.addOrder(newOrder);
 
@@ -198,7 +194,7 @@ export class OrderPage implements OnInit {
       const selectedProduct = selectedProducts[productType];
       if (selectedProduct) {
         detailsToAdd.push({
-          idDetail: orderNum.toString() + 
+          id: orderNum.toString() + 
           "-" + this.indexConjunto.toString().padStart(2, '0') + 
           "-" + index.toString().padStart(2, '0'),
           productCode: selectedProduct.productCode,
@@ -245,6 +241,14 @@ export class OrderPage implements OnInit {
       }
 
       order.status = "Preparacion";
+
+      console.log(order.id);
+      console.log(order.orderNum);
+      console.log(order.orderDate);
+      console.log(order.userName);
+      console.log(order.totalPrice);
+      console.log(order.status);
+      console.log(order.boardNum);
   
       // Crear la orden en la API
       await this.apiService.addOrder(order).subscribe(
@@ -262,11 +266,11 @@ export class OrderPage implements OnInit {
             console.log('Todos los detalles de la orden creados exitosamente en la API.');
   
             // Eliminar la orden y los detalles de SQLite después de sincronización
-            await this.sqliteService.delOrder(orderNum);
-            console.log('Orden eliminada de SQLite después de sincronización.');
-  
             await this.sqliteService.delOrderDetail(orderNum);
             console.log('Detalles de la orden eliminados de SQLite después de sincronización.');
+
+            await this.sqliteService.delOrder(orderNum);
+            console.log('Orden eliminada de SQLite después de sincronización.');
   
             // Mostrar alerta de éxito
             const alert = await this.alertController.create({

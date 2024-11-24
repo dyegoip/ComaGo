@@ -23,12 +23,14 @@ export class AppComponent implements OnInit{
               private apiService: ApiService) 
               {
                 this.checkAuthentication();
-                this.showSplash();
               }
 
   async ngOnInit() {
     await this.initializeDatabase();
     await this.checkApiConnection();
+    if (!this.isAuthenticated) {
+      this.navCtrl.navigateRoot('/login');
+    }
   }
 
   async showSplash(){
@@ -79,9 +81,8 @@ export class AppComponent implements OnInit{
     sessionStorage.setItem('isAuthenticated', 'false');
     this.isAuthenticated = false;
     console.log('Sesión cerrada');
-    
-    this.router.navigate(['/login']).then(() => {
-      window.location.reload();
-    });
+  
+    this.navCtrl.navigateRoot('/login');
   }
+  
 }

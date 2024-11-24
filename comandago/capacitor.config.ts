@@ -7,9 +7,9 @@ const config: CapacitorConfig = {
   bundledWebRuntime: false,
   plugins: {
     SplashScreen: {
-      launchShowDuration: 0,
+      launchShowDuration: 3000,
       launchAutoHide: true,
-      launchFadeOutDuration: 3000,
+      launchFadeOutDuration: 500,
       backgroundColor: "#B998EC",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
@@ -17,8 +17,8 @@ const config: CapacitorConfig = {
       androidSpinnerStyle: "large",
       iosSpinnerStyle: "small",
       spinnerColor: "#999999",
-      splashFullScreen: false,
-      splashImmersive: false,
+      splashFullScreen: true,
+      splashImmersive: true,
       layoutName: "launch_screen",
       useDialog: true,
     },
