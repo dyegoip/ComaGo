@@ -42,7 +42,8 @@ export class LoginPage implements OnInit {
 
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   ngAfterViewInit(): void {
     this.loginJqueryValidate();
@@ -144,15 +145,14 @@ export class LoginPage implements OnInit {
               const userId = this.userApi.id;
               const userApi = this.userApi.userName;
               const passApi = this.userApi.password;
-        
-              console.log('Nombre de usuario: ' + userApi + ' - ' + userValue);
-              console.log('Contraseña: ' + passApi + ' - ' + passValue);
+              const userRole = this.userApi.rol;
         
               // Verifica las credenciales aquí
               if (userValue == userApi && passValue == passApi) {
                 sessionStorage.setItem('isAuthenticated', 'true');
                 sessionStorage.setItem('userId', userId);
                 sessionStorage.setItem('userName', userApi);
+                sessionStorage.setItem('userRole', userRole);
                 const alert = await this.alertController.create({
                   header: 'Login Exitoso',
                   message: 'Bienvenido/a ' + this.userApi.fullName,
@@ -163,7 +163,8 @@ export class LoginPage implements OnInit {
                         const navigationExtras: NavigationExtras = {
                           state: {
                             userId: userId,
-                            userName: userApi
+                            userName: userApi,
+                            userRole: userRole
                           }
                         };
                         this.router.navigate(['/home'], navigationExtras).then(() => {

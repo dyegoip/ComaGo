@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, catchError, map, Observable, of, switchMap, throwError, timeout } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap, throwError, timeout } from 'rxjs';
 import { User } from '../user/user.page';
 import { Product } from '../product/product.page'
 import { Order } from '../order/order.page';
@@ -125,6 +125,18 @@ export class ApiService {
     return this.http.put(`${this.apiUrl}/products/${product.id}`, product);
   }
 
+  updateProductStock(productId: string, quantity: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/products/${productId}`, { "stock": quantity }).pipe(
+      tap(response => {
+        console.log('Respuesta de la API: ', response);  // Muestra la respuesta en la consola
+      }),
+      catchError(error => {
+        console.error('Error al actualizar el stock de productos', error);
+        throw error;
+      })
+    );
+  }
+
   //Funciones Pedido(Order)//
 
   getOrder(): Observable<Order[]> {
@@ -188,4 +200,17 @@ export class ApiService {
   editBoard(board: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/board/${board.id}`, board);
   }
+
+  updateBoardStatus(board: any, newStatus: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/board/${board.id}`, { "status": board.status }).pipe(
+      tap(response => {
+        console.log('Respuesta de la API: ', response);  // Muestra la respuesta en la consola
+      }),
+      catchError(error => {
+        console.error('Error al actualizar el estado de la mesa', error);
+        throw error;
+      })
+    );
+  }
+  
 }

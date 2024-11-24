@@ -45,6 +45,7 @@ export class EditUserPage implements OnInit {
         rol: userEdit.rol.toString(),
         password: userEdit.password
       });
+      console.log(this.userForm.value);
     } else {
       console.log('No hay usuario');
     }
@@ -60,7 +61,7 @@ export class EditUserPage implements OnInit {
   
     if (this.userForm.valid) {
       const editUser = this.userForm.value;
-  
+      editUser.rol = parseInt(editUser.rol, 10);
       if (this.apiConnect) {
         try {
           const response = await this.apiService.editUser(editUser).toPromise();

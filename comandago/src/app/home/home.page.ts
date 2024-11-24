@@ -45,7 +45,6 @@ export class HomePage implements OnInit {
     this.apiService.getUserById(this.userId).subscribe(
       (data) => {
         this.userApi = data;
-        console.log('Usuario obtenido:', this.userApi);
       },
       (error) => console.error('Error al obtener el usuario:', error)
     );

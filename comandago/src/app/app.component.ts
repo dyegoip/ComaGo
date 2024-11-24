@@ -83,6 +83,7 @@ export class AppComponent implements OnInit{
     console.log('Sesión cerrada');
   
     this.navCtrl.navigateRoot('/login');
+    window.location.reload();
   }
   
 }

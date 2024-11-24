@@ -351,7 +351,7 @@ async delOrderDetail(orderNum: number): Promise<number> {
   async addBoard(board: Board): Promise<number> {
     if (this.dbInstance) {
       const sql = `INSERT INTO BOARD (BOARDID, NUMBOARD, CAPACITY, STATUS) VALUES (?, ?, ?, ?)`;
-      const values = [board.id, board.boardnum, board.capacity, board.status];
+      const values = [board.id, board.boardNum, board.capacity, board.status];
       const res = await this.dbInstance.executeSql(sql, values);
       return res.insertId;
     } else {
@@ -380,7 +380,7 @@ async delOrderDetail(orderNum: number): Promise<number> {
         const board = res.rows.item(0);
         return {
           id: board.id,
-          boardnum: board.boardnum,
+          boardNum: board.boardnum,
           capacity: board.capacity,
           status: board.status
         };

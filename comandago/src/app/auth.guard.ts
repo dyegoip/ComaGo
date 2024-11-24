@@ -1,27 +1,29 @@
-import { CanActivateFn, CanActivate, Router } from '@angular/router';
+import { map } from 'rxjs';
 import { Injectable } from '@angular/core';
-
-export const authGuard: CanActivateFn = (route, state) => {
-  return true;
-};
+import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
+import { RolesService } from './services/roles.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(private router: Router) {}
+  constructor(private rolesService: RolesService, private router: Router) {}
 
-  canActivate(): boolean {
-    const user = sessionStorage.getItem('isAuthenticated'); // Verifica si hay un usuario logueado mediante sessionStorage
+  canActivate(route: ActivatedRouteSnapshot): boolean {
+    const userRole = this.rolesService.getUserRole(); // Obtener el rol del usuario
+    const expectedRoles = route.data['expectedRoles']; // Obtener los roles permitidos
     
-    if (user === 'true') {
-      console.log("canactivate " + user);
-      return true; // Si el usuario está logueado, permite acceso
-    } else {
-      console.log("canactivate " + user);
-      this.router.navigate(['']); // Si no está logueado, redirige a login
-      return false;
+    // Verificar si el rol del usuario está incluido en los roles permitidos
+    if (expectedRoles && expectedRoles.includes(userRole)) {
+      return true; // Acceso permitido
+    }else if(!expectedRoles){
+      return true;
     }
+  
+    // Redirigir al usuario a una página de acceso denegado
+    this.router.navigate(['/access-denied']);
+    return false; // Acceso denegado
   }
+  
 }
