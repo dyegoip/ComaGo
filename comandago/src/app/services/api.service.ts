@@ -109,6 +109,10 @@ export class ApiService {
     return this.http.get(`${this.apiUrl}/products/${id}`);
   }
 
+  getProductByProductCode(id: string) {
+    return this.http.get(`${this.apiUrl}/products?productCode=${id}`);
+  }
+
   getProductByproductName(productName: string) {
     return this.http.get(`${this.apiUrl}/products/?productName=${productName}`);
   }
@@ -126,12 +130,12 @@ export class ApiService {
   }
 
   updateProductStock(productId: string, quantity: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/products/${productId}`, { "stock": quantity }).pipe(
+    return this.http.patch(`${this.apiUrl}/products/${productId}`, { "stock": quantity }).pipe(
       tap(response => {
         console.log('Respuesta de la API: ', response);  // Muestra la respuesta en la consola
       }),
       catchError(error => {
-        console.error('Error al actualizar el stock de productos', error);
+        console.error('Error al actualizar el stock de productos', JSON.stringify(error, null, 2));
         throw error;
       })
     );

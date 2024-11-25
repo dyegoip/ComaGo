@@ -26,8 +26,8 @@ export interface DetailOrder {
 }
 
 interface ProductTotals {
-  [id: string]: { 
-    id: string; 
+  [productCode: string]: { 
+    productCode: string; 
     totalQuantity: number;
   };
 }
@@ -407,14 +407,14 @@ export class OrderPage implements OnInit {
       }
   
       // 2. Agrupar productos por su ID y sumar las cantidades pedidas
-      const productTotals = orderDetails.reduce((acc: Record<string, { id: string; totalQuantity: number }>, detail) => {
-        const { id, quantity } = detail;
+      const productTotals = orderDetails.reduce((acc: Record<string, { productCode: string; totalQuantity: number }>, detail) => {
+        const { productCode, quantity } = detail;
   
-        if (!acc[id]) {
-          acc[id] = { id, totalQuantity: 0 };
+        if (!acc[productCode]) {
+          acc[productCode] = { productCode, totalQuantity: 0 };
         }
   
-        acc[id].totalQuantity += quantity;
+        acc[productCode].totalQuantity += quantity;
         return acc;
       }, {});
   
@@ -425,37 +425,31 @@ export class OrderPage implements OnInit {
   
       // 3. Actualizar el stock en la API
       const updatePromises = aggregatedProducts.map(async (product) => {
-        const { id, totalQuantity } = product;
+        const { productCode, totalQuantity } = product;
   
         try {
-          // Obtener el producto actual desde la API
-          const currentProduct: any = await this.apiService.getProductById(id).toPromise();
-  
-          if (!currentProduct || currentProduct.stock === undefined) {
-            console.error(`No se encontró el producto con ID ${id}.`);
-            return;
-          }
-  
-          const currentStock = currentProduct.stock - totalQuantity;
-  
-          // Calcular el nuevo stock
-          const newStock = currentStock - totalQuantity;
+          // Obtener el producto actual desde la API         
+          const currentProducts: any = await this.apiService.getProductByProductCode(productCode).toPromise();
+          const currentProduct = currentProducts[0];
+          console.log("Product ID:", currentProducts?.id);
+
+          const newStock = currentProduct.stock - totalQuantity;
   
           if (newStock < 0) {
-            console.warn(`El stock del producto ${id} no es suficiente. Stock actual: ${currentStock}, solicitado: ${totalQuantity}`);
+            console.warn(`El stock del producto ${productCode} no es suficiente. Stock actual: ${newStock}, solicitado: ${totalQuantity}`);
             return;
           }
   
           // Llamada a la API para actualizar el stock
-          const response = await this.apiService.updateProductStock(id, newStock);
+          const response = await this.apiService.updateProductStock(currentProduct.id, newStock).toPromise();
   
           if (response) {
-            console.log(`Stock del producto ${id} actualizado con éxito. Nuevo stock: ${newStock}`);
+            console.log(`Stock del producto ${productCode} actualizado con éxito. Nuevo stock: ${newStock}`);
           } else {
-            console.error(`Error al actualizar el stock del producto ${id}:`, response);
+            console.error(`Error al actualizar el stock del producto ${productCode}:`, response);
           }
         } catch (error) {
-          console.error(`Error al procesar el producto ${id}:`, error);
+          console.error(`Error al procesar el producto ${productCode}:`, error);
         }
       });
   
