@@ -24,6 +24,13 @@ export class SQliteService {
       await this.dbInstance.executeSql('PRAGMA foreign_keys = ON;', []);
 
       await this.dbInstance.executeSql(`
+        CREATE TABLE IF NOT EXISTS CONFIG (
+          IDPARAM TEXT PRIMARY KEY,
+          VALUE TEXT UNIQUE
+        );
+      `, []);
+
+      await this.dbInstance.executeSql(`
         CREATE TABLE IF NOT EXISTS USER (
           IDUSER TEXT PRIMARY KEY,
           USERNAME TEXT UNIQUE,
@@ -82,6 +89,46 @@ export class SQliteService {
       console.error('Error creating database', JSON.stringify(error));
     }
   }
+
+  async addParam(idParam: string, value: string): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `DELETE FROM CONFIG WHERE IDPARAM = ?`;
+      const values = [idParam];
+      const res = await this.dbInstance.executeSql(sql, values);
+
+      const sql2 = `INSERT OR REPLACE INTO CONFIG (IDPARAM, VALUE) VALUES (?, ?)`;
+      const values2 = [idParam];
+      const res2 = await this.dbInstance.executeSql(sql2, values2);
+      console.log('Resultado de la inserción o reemplazo:', JSON.stringify(res2));
+      return res2.insertId;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async getParam(idParam: string): Promise<string | null> {
+    if (this.dbInstance) {
+      const sql = `SELECT VALUE FROM CONFIG WHERE IDPARAM = ?`;
+      const values = [idParam];
+  
+      try {
+        const res = await this.dbInstance.executeSql(sql, values);
+        if (res && res.rows && res.rows.length > 0) {
+          const paramValue = res.rows.item(0).VALUE;
+          return paramValue; // Regresa el valor almacenado de la IP
+        } else {
+          return null; // Si no se encuentra el parámetro
+        }
+      } catch (error) {
+        console.error('Error al obtener el parámetro', error);
+        return null;
+      }
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+  
+  
 
   async addUser(user: User): Promise<number> {
     //const salt = await bcrypt.genSalt(10);
@@ -252,7 +299,6 @@ export class SQliteService {
     }
   }
   
-
   async delOrder(orderNum: number): Promise<number> {
     if (this.dbInstance) {
       const sql = `DELETE FROM \`ORDER\` WHERE ORDERNUM = ?`;
@@ -332,19 +378,77 @@ export class SQliteService {
   } else {
     throw new Error('Database is not initialized');
   }
-}
-
-async delOrderDetail(orderNum: number): Promise<number> {
-  if (this.dbInstance) {
-    const sql = `DELETE FROM ORDERDETAIL WHERE ORDERNUM = ?`;
-    const values = [orderNum];
-    const res = await this.dbInstance.executeSql(sql, values);
-    
-    return res.rowsAffected;
-  } else {
-    throw new Error('Database is not initialized');
   }
-}
+
+  async getOrderDetailsByGroupId(groupId: string): Promise<DetailOrder[] | null> {
+    if (this.dbInstance) {
+      // Consulta para seleccionar los detalles cuyo IDDETAIL empieza con groupId
+      const sql = `SELECT * FROM ORDERDETAIL WHERE IDDETAIL LIKE ?`;
+      const value = [`${groupId}%`]; // Usar el prefijo con el wildcard %
+  
+      try {
+        const res = await this.dbInstance.executeSql(sql, value);
+        if (res && res.rows && res.rows.length > 0) {
+          const details: DetailOrder[] = [];
+          for (let i = 0; i < res.rows.length; i++) {
+            const detail = res.rows.item(i);
+            details.push({
+              id: detail.IDDETAIL,
+              productCode: detail.PRODUCTCODE,
+              orderNum: detail.ORDERNUM,
+              quantity: detail.QUANTITY,
+              price: detail.PRICE,
+            });
+          }
+          return details;
+        } else {
+          return null; // No hay registros para el groupId
+        }
+      } catch (error) {
+        console.error('Error al consultar ORDERDETAIL por groupId:', JSON.stringify(error));
+        return null;
+      }
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+
+  async delOrderDetailId(detailId: string): Promise<boolean> {
+    if (this.dbInstance) {
+      const sql = `DELETE FROM ORDERDETAIL WHERE IDDETAIL = ?`;
+      const values = [detailId];
+  
+      try {
+        const res = await this.dbInstance.executeSql(sql, values);
+  
+        // Verificar si se eliminó alguna fila
+        if (res && res.rowsAffected > 0) {
+          console.log(`Detalle de orden con ID ${detailId} eliminado con éxito.`);
+          return true;
+        } else {
+          console.log(`No se encontró ningún detalle de orden con ID ${detailId} para eliminar.`);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error al eliminar detalle de orden: ', JSON.stringify(error));
+        return false;
+      }
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+  
+  async delOrderDetail(orderNum: number): Promise<number> {
+    if (this.dbInstance) {
+      const sql = `DELETE FROM ORDERDETAIL WHERE ORDERNUM = ?`;
+      const values = [orderNum];
+      const res = await this.dbInstance.executeSql(sql, values);
+      
+      return res.rowsAffected;
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
 
   //Funciones Mesa//
 

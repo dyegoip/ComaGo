@@ -38,6 +38,16 @@
       <a [routerLink]="['/recoverypass']" class="a-center">Olvide mi contraseña</a>
     </div>
   </div>
+
+  <div class="container-father">
+    <mat-form-field class="input">
+      <mat-label>Configurar IP</mat-label>
+      <input matInput placeholder="Escribe la IP" #ipInput>
+    </mat-form-field>
+    <div class="password">
+      <ion-button color="primary" (click)="saveIp(ipInput.value)">Guardar IP</ion-button>
+    </div>
+  </div>
 </ion-content>
 
 <ion-footer>

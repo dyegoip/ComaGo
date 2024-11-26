@@ -115,6 +115,7 @@
               <ion-label><strong>Postre:</strong> {{ group.postre || 'No seleccionado' }}</ion-label>
             </ion-item>
           </ion-card-content>
+          <ion-button color="danger" (click)="removeGroup(group.id)">Eliminar Conjunto</ion-button>
         </ion-card>
         <ion-button (click)="confirmOrder(createdOrderId)">Confirmar Pedido</ion-button>
       </div>

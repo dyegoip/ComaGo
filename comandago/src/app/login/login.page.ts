@@ -1,3 +1,4 @@
+import { SQliteService } from './../services/sqlite.service';
 import { ChangeDetectionStrategy, signal, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -36,9 +37,12 @@ export class LoginPage implements OnInit {
   @ViewChild('userInput', { static: true }) user!: ElementRef;
   @ViewChild('passInput', { static: true }) pass!: ElementRef;
 
-  constructor(public fb: FormBuilder, public router: Router, 
-              public alertController: AlertController, private menu: MenuController,
-              private apiService: ApiService) {
+  constructor(public fb: FormBuilder, 
+              public router: Router, 
+              public alertController: AlertController,
+              private menu: MenuController,
+              private apiService: ApiService,
+              private sqliteService: SQliteService,) {
 
   }
 
@@ -207,4 +211,56 @@ export class LoginPage implements OnInit {
       });
     });
   }
+
+  async saveIp(ip: string): Promise<void> {
+    if (!ip) {
+      console.error('La IP no puede estar vacía.');
+      return;
+    }
+  
+    try {
+      // Usamos addParam para guardar la IP
+      const paramId = 'SERVER_IP';
+      const insertedId = '1'//await this.sqliteService.addParam(paramId, ip);
+      localStorage.setItem('SERVER_IP', ip);
+      console.log('ID de la IP guardada:', insertedId);
+  
+      // Mostrar alerta de éxito
+      const alert = await this.alertController.create({
+        header: 'IP Guardada',
+        message: `La dirección IP ${ip} ha sido configurada correctamente.`,
+        buttons: [
+          {
+            text: 'Aceptar',
+            handler: () => {
+              this.router.navigate(['/login']).then(() => {
+                window.location.reload();
+              });
+            }
+          }
+        ],
+      });
+      await alert.present();
+    } catch (error) {
+      console.error('Error al guardar la IP:', error);
+  
+      // Mostrar alerta de error
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'No se pudo guardar la dirección IP. Intenta de nuevo.',
+        buttons: [
+          {
+            text: 'Aceptar',
+            handler: () => {
+              this.router.navigate(['/login']).then(() => {
+                window.location.reload();
+              });
+            }
+          }
+        ],
+      });
+      await alert.present();
+    }
+  }
+  
 }

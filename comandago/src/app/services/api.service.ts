@@ -5,27 +5,42 @@ import { User } from '../user/user.page';
 import { Product } from '../product/product.page'
 import { Order } from '../order/order.page';
 import { Board } from '../board/board.page';
+import { SQliteService } from './sqlite.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  //private apiUrl = 'http://localhost:3000';
-  private apiUrl = 'http://192.168.1.94:3000';
-  //private apiUrl = 'http://192.168.91.20:3000';
-  //private apiUrl = 'http://172.16.131.197:3000';
-  //private apiUrl = 'http://192.168.100.74:3000';
+  private ip: string  = localStorage.getItem('SERVER_IP') ?? "";
+  private apiUrl = 'http://'+ this.ip +':3000';
+  private ipParamId = 'SERVER_IP';
 
   private apiConnectionStatus = new BehaviorSubject<boolean>(false);
   connectionStatus$ = this.apiConnectionStatus.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private sqliteService: SQliteService,) {
+    // this.getApiUrl().then(url => {
+    //   this.apiUrl = url;
+    // });
+
     this.checkApiConnection().subscribe(status => {
       this.apiConnectionStatus.next(status);
     });
+     this.getApiUrl();
+  }
+
+  private async getApiUrl(){
+    const ip = await this.sqliteService.getParam(this.ipParamId);
+    if (ip) {
+      console.log('ip: ' + ip);
+      return `http://${ip}:3000`;
+    } else {
+      return this.apiUrl;
+    }
   }
   
   checkApiConnection(): Observable<boolean> {
+    console.log(this.apiUrl);
     return this.http.get(`${this.apiUrl}/users`).pipe(
       timeout(3000),
       map(() => true),
@@ -57,6 +72,7 @@ export class ApiService {
   }
 
   getUserByUserName(userName: string) {
+    console.log(localStorage.getItem('SERVER_IP'))
     return this.http.get(`${this.apiUrl}/users/?userName=${userName}`);
   }
 

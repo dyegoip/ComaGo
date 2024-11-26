@@ -226,8 +226,12 @@ export class OrderPage implements OnInit {
     const selectedProducts = this.detailOrderForm.value;
     const detailsToAdd = [];
 
-    const group: { [key: string]: string } = {};
+    const group: { id: string; [key: string]: string } = { id: '' }; // Incluir id en el grupo
     let index = 1;
+
+    // Generar ID único del conjunto
+    const groupId = `${orderNum.toString()}-${this.indexConjunto.toString().padStart(2, '0')}`;
+    group.id = groupId;
 
     for (const productType in selectedProducts) {
       const selectedProduct = selectedProducts[productType];
@@ -261,6 +265,45 @@ export class OrderPage implements OnInit {
     await successAlert.present();
 
     this.detailOrderForm.reset();
+  }
+
+  async removeGroup(groupId: string) {
+    try {
+      // Obtener y eliminar todos los detalles asociados al grupo en SQLite
+      const details = await this.sqliteService.getOrderDetailsByGroupId(groupId);
+
+      if (details) {
+        for (const detail of details) {
+          const success = await this.sqliteService.delOrderDetailId(detail.id);
+          if (success) {
+            console.log(`Detalle de orden con ID ${detail.id} eliminado correctamente.`);
+          } else {
+            console.log(`No se pudo eliminar el detalle de orden con ID ${detail.id}.`);
+          }
+        }
+      } else {
+        console.log('No se encontraron detalles para el groupId especificado.');
+      }
+  
+      // Eliminar el grupo de la vista
+      this.displayedOrders = this.displayedOrders.filter(group => group.id !== groupId);
+  
+      // Mostrar alerta de éxito
+      const successAlert = await this.alertController.create({
+        header: 'Grupo eliminado',
+        message: `El conjunto de productos ${groupId} ha sido eliminado.`,
+        buttons: ['Aceptar'],
+      });
+      await successAlert.present();
+    } catch (error) {
+      console.error('Error al eliminar el grupo:', error);
+      const errorAlert = await this.alertController.create({
+        header: 'Error',
+        message: 'Hubo un problema al eliminar el grupo. Por favor, inténtelo de nuevo.',
+        buttons: ['Aceptar'],
+      });
+      await errorAlert.present();
+    }
   }
 
   async confirmOrder(orderNum: number) {
