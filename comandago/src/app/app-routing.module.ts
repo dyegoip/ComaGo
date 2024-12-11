@@ -88,7 +88,15 @@ const routes: Routes = [
   {
     path: 'access-denied',
     loadChildren: () => import('./pages/access-denied/access-denied.module').then(m => m.AccessDeniedPageModule)
+  },  {
+    path: 'add-board',
+    loadChildren: () => import('./add-board/add-board.module').then( m => m.AddBoardPageModule)
+  },
+  {
+    path: 'edit-board',
+    loadChildren: () => import('./edit-board/edit-board.module').then( m => m.EditBoardPageModule)
   }
+
 ];
 
 @NgModule({

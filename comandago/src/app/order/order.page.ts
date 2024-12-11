@@ -141,7 +141,7 @@ export class OrderPage implements OnInit {
   }
 
   getBoards() {
-    this.apiService.getBoard().subscribe(
+    this.apiService.getBoards().subscribe(
       (data: Board[]) => {
         this.allBoards = data.filter((b) => b.status == 1);
       },
@@ -173,7 +173,7 @@ export class OrderPage implements OnInit {
         
         try {
           // Espera la respuesta de la API
-          const response = await this.apiService.updateBoardStatus(this.selectBoard, this.selectBoard.status).toPromise();
+          const response = await this.apiService.updateBoardStatus(this.selectBoard.id, this.selectBoard.status).toPromise();
           
           // Si la respuesta es exitosa, puedes manejar el resultado
           if (response) {

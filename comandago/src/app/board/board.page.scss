@@ -1,0 +1,50 @@
+.user-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 5px;
+  }
+  
+  .user-name {
+    flex: 1;
+    text-align: left;
+    font-size: 16px;
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .button-container ion-button {
+    width: 50px; /* Ancho del botón cuadrado */
+    height: 50px; /* Alto del botón cuadrado */
+    margin-left: 10px; /* Espaciado entre los botones */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    --border-radius: 8px; /* Bordes redondeados */
+  }
+  
+  /* Colores personalizados para los botones */
+  .view-button {
+    background-color: #4caf50; /* Verde para ver */
+    color: white;
+  }
+  
+  .edit-button {
+    background-color: #2196f3; /* Azul para editar */
+    color: white;
+  }
+  
+  .delete-button {
+    background-color: #f44336; /* Rojo para eliminar */
+    color: white;
+  }
+  
+  .button-container ion-icon {
+    font-size: 24px; /* Tamaño del ícono */
+  }
+  

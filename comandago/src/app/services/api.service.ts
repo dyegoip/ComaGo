@@ -197,40 +197,33 @@ export class ApiService {
 
   //Funciones Api Mesa//
 
-  getBoard(): Observable<Board[]> {
-    return this.http.get<Board[]>(`${this.apiUrl}/board`);
-  }
-
-  getBoardById(id: string) {
-    return this.http.get(`${this.apiUrl}/board/${id}`);
-  }
-
-  getBoardByboardName(productName: string) {
-    return this.http.get(`${this.apiUrl}/products/?productName=${productName}`); //Posible Modificacion//
-  }
-
   addBoard(board: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/board/`, board);
+    return this.http.post(`${this.apiUrl}/boards/`, board);
   }
-
+  
   deleteBoard(boardId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/board/${boardId}`);
+    return this.http.delete<void>(`${this.apiUrl}/boards/${boardId}`);
   }
-
+  
   editBoard(board: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/board/${board.id}`, board);
+    return this.http.put(`${this.apiUrl}/boards/${board.id}`, board);
   }
-
-  updateBoardStatus(board: any, newStatus: number): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/board/${board.id}`, { "status": board.status }).pipe(
+  
+  updateBoardStatus(boardId: string, status: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/boards/${boardId}`, { "status": status }).pipe(
       tap(response => {
-        console.log('Respuesta de la API: ', response);  // Muestra la respuesta en la consola
+        console.log('Respuesta de la API: ', response);
       }),
       catchError(error => {
-        console.error('Error al actualizar el estado de la mesa', error);
+        console.error('Error al actualizar el estado de la mesa', JSON.stringify(error, null, 2));
         throw error;
       })
     );
   }
+  
+  getBoards(): Observable<Board[]> {
+    return this.http.get<Board[]>(`${this.apiUrl}/board`);
+  }
+  
   
 }

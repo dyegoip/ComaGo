@@ -452,46 +452,33 @@ export class SQliteService {
 
   //Funciones Mesa//
 
-  async addBoard(board: Board): Promise<number> {
+  async addBoard(board: any): Promise<number> {
     if (this.dbInstance) {
-      const sql = `INSERT INTO BOARD (BOARDID, NUMBOARD, CAPACITY, STATUS) VALUES (?, ?, ?, ?)`;
-      const values = [board.id, board.boardNum, board.capacity, board.status];
+      const sql = `
+        INSERT INTO BOARD (IDBOARD, BOARDNUM, CAPACITY, STATUS)
+        VALUES (?, ?, ?, ?)
+      `;
+      const values = [
+        board.id,
+        board.boardNum,
+        board.capacity,
+        board.status
+      ];
       const res = await this.dbInstance.executeSql(sql, values);
+      console.log('Mesa guardada:', JSON.stringify(res));
       return res.insertId;
     } else {
       throw new Error('Database is not initialized');
     }
   }
-
-  async delBoard(boardId: number): Promise<number> {
+  
+  async delBoard(boardNum: number): Promise<number> {
     if (this.dbInstance) {
-      const sql = `DELETE FROM BOARD WHERE BOARDID = ?`;
-      const values = [boardId];
+      const sql = `DELETE FROM BOARD WHERE BOARDNUM = ?`;
+      const values = [boardNum];
       const res = await this.dbInstance.executeSql(sql, values);
-      
+      console.log('Mesas eliminadas:', res.rowsAffected);
       return res.rowsAffected;
-    } else {
-      throw new Error('Database is not initialized');
-    }
-  }
-
-  async getBoardByboardNumber(boardnum: number): Promise<Board | null> {
-    if (this.dbInstance) {
-      const sql = `SELECT * FROM BOARD WHERE NUMBERBOARD = ?`;
-      const values = [boardnum];
-      const res = await this.dbInstance.executeSql(sql, values);
-      if (res.rows.length > 0) {
-        const board = res.rows.item(0);
-        return {
-          id: board.id,
-          boardNum: board.boardnum,
-          capacity: board.capacity,
-          status: board.status
-        };
-
-      } else {
-        return null;  // No se encontró un administrador con ese correo
-      }
     } else {
       throw new Error('Database is not initialized');
     }
