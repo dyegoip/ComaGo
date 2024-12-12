@@ -1,13 +1,37 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>edit-board</ion-title>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Editar Mesa</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">edit-board</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="container-father">
+    <form [formGroup]="boardForm" (ngSubmit)="onEditBoard()">
+      <ion-item>
+        <ion-label position="stacked">Número de Mesa</ion-label>
+        <ion-input formControlName="boardNum" type="number" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Capacidad</ion-label>
+        <ion-input formControlName="capacity" type="number" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Estado</ion-label>
+        <ion-select formControlName="status" interface="action-sheet" required>
+          <ion-select-option value="1">Disponible</ion-select-option>
+          <ion-select-option value="0">Ocupada</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <div class="password" style="margin-top: 10px;">
+        <ion-button id="saveButton" type="submit" color="primary" [disabled]="boardForm.invalid">Guardar</ion-button>
+        <ion-button id="backButton" color="primary" (click)="navigateToBoard()">Volver</ion-button>
+      </div>
+    </form>
+  </div>
 </ion-content>

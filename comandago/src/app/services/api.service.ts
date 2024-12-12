@@ -198,19 +198,19 @@ export class ApiService {
   //Funciones Api Mesa//
 
   addBoard(board: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/boards/`, board);
+    return this.http.post(`${this.apiUrl}/board/`, board);
   }
   
   deleteBoard(boardId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/boards/${boardId}`);
+    return this.http.delete<void>(`${this.apiUrl}/board/${boardId}`);
   }
   
   editBoard(board: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/boards/${board.id}`, board);
+    return this.http.put(`${this.apiUrl}/board/${board.id}`, board);
   }
   
   updateBoardStatus(boardId: string, status: number): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/boards/${boardId}`, { "status": status }).pipe(
+    return this.http.patch(`${this.apiUrl}/board/${boardId}`, { "status": status }).pipe(
       tap(response => {
         console.log('Respuesta de la API: ', response);
       }),

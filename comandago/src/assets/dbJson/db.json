@@ -6,7 +6,8 @@
       "fullName": "Diego Penaloza",
       "email": "die.penaloza@duocuc.cl",
       "rol": 1,
-      "password": "123456"
+      "password": "123456",
+      "photo": ""
     },
     {
       "id": "126540",
@@ -17,7 +18,7 @@
       "password": "123456"
     },
     {
-      "id": 147360,
+      "id": "147360",
       "userName": "rafu",
       "fullName": "Rafu Quichiz",
       "email": "ra.quichiz@duoc.cl",
@@ -266,7 +267,7 @@
       "id": "3432",
       "boardNum": 2,
       "capacity": 3,
-      "status": 2
+      "status": 0
     },
     {
       "id": "23432",

@@ -36,7 +36,6 @@
       <ion-list *ngIf="find">
 
         <ion-item *ngFor="let board of filteredBoards">
-          <!-- Contenedor principal de la mesa -->
           <div class="board-container">
             <ion-label class="board-number">Mesa #{{ board.boardNum }}</ion-label>
 
@@ -47,14 +46,17 @@
             </ion-label>
 
             <div class="button-container">
-              <ion-button class="view-button" fill="clear" (click)="onViewBoardDetails(board)">
-                <ion-icon name="eye-outline"></ion-icon> <!-- Icono para ver detalles -->
-              </ion-button>
+              <!-- <ion-button class="view-button" fill="clear" (click)="onViewBoardDetails(board)">
+                <ion-icon name="eye-outline"></ion-icon>
+              </ion-button> -->
               <ion-button class="edit-button" fill="clear" (click)="onEditBoard(board)">
-                <ion-icon name="create-outline"></ion-icon> <!-- Icono para editar -->
+                <ion-icon name="create-outline"></ion-icon>
               </ion-button>
               <ion-button class="delete-button" fill="clear" (click)="onDeleteBoard(board)">
-                <ion-icon name="trash-outline"></ion-icon> <!-- Icono para eliminar -->
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+              <ion-button class="change-button" fill="clear" (click)="toggleBoardStatus(board)">
+                <ion-icon name="swap-horizontal-outline"></ion-icon>
               </ion-button>
             </div>
           </div>

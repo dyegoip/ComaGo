@@ -151,27 +151,43 @@ export class BoardPage implements OnInit {
     }
   }
 
-  // async syncBoardsWithApi() {
-  //   try {
-  //     const boards = await this.sqliteService.getAllBoards();
-  //     if (boards && boards.length > 0) {
-  //       for (const board of boards) {
-  //         try {
-  //           const response = await this.apiService.addBoard(board).toPromise();
-  //           if (response) {
-  //             this.addLog(`Mesa ${board.boardNum} - ${board.id} insertada en la API exitosamente`);
-  //             await this.sqliteService.delBoard(board.boardNum);
-  //             this.addLog(`Mesa ${board.boardNum} - ${board.id} eliminada de SQLite exitosamente`);
-  //           }
-  //         } catch (error) {
-  //           this.addLog(`Error al insertar la mesa ${board.boardNum} - ${board.id} en la API: ` + error);
-  //         }
-  //       }
-  //     } else {
-  //       this.addLog('No se encontraron mesas en la base de datos SQLite para sincronizar.');
-  //     }
-  //   } catch (error) {
-  //     this.addLog('Error durante la sincronización de mesas: ' + error);
-  //   }
-  // }
+  toggleBoardStatus(board: Board) {
+    const newStatus = board.status === 1 ? 0 : 1;
+
+    // Actualizar el estado en la API
+    this.apiService.updateBoardStatus(board.id, newStatus).subscribe({
+      next: () => {
+        // Cambiar el estado localmente solo si la API responde correctamente
+        board.status = newStatus;
+        console.log(`Estado de la mesa ${board.id} actualizado a ${newStatus === 1 ? 'Ocupada' : 'Disponible'}`);
+      },
+      error: (error) => {
+        console.error('Error al actualizar el estado de la mesa:', error);
+      },
+    });
+  }
+
+  async syncBoardsWithApi() {
+    try {
+      const boards = await this.sqliteService.getAllBoards();
+      if (boards && boards.length > 0) {
+        for (const board of boards) {
+          try {
+            const response = await this.apiService.addBoard(board).toPromise();
+            if (response) {
+              this.addLog(`Mesa ${board.boardNum} - ${board.id} insertada en la API exitosamente`);
+              await this.sqliteService.delBoard(board.boardNum);
+              this.addLog(`Mesa ${board.boardNum} - ${board.id} eliminada de SQLite exitosamente`);
+            }
+          } catch (error) {
+            this.addLog(`Error al insertar la mesa ${board.boardNum} - ${board.id} en la API: ` + error);
+          }
+        }
+      } else {
+        this.addLog('No se encontraron mesas en la base de datos SQLite para sincronizar.');
+      }
+    } catch (error) {
+      this.addLog('Error durante la sincronización de mesas: ' + error);
+    }
+  }
 }

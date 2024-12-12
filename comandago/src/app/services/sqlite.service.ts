@@ -484,4 +484,38 @@ export class SQliteService {
     }
   }
 
+  async getAllBoards(): Promise<Board[] | null> {
+    if (this.dbInstance) {
+      const sql = `SELECT * FROM BOARD`;
+      
+      try {
+        const res = await this.dbInstance.executeSql(sql, []);
+        
+        if (res && res.rows && res.rows.length > 0) {
+          const boards: Board[] = [];
+          
+          for (let i = 0; i < res.rows.length; i++) {
+            const board = res.rows.item(i);
+            console.log(`Board ID: ${board.ID}`);
+            boards.push({
+              id: board.ID,
+              boardNum: board.BOARDNUM,
+              capacity: board.CAPACITY,
+              status: board.STATUS
+            });
+          }
+          return boards;
+        } else {
+          return null;
+        }
+      } catch (error) {
+        console.error('Error al consultar todas las mesas: ', JSON.stringify(error));
+        return null;
+      }
+    } else {
+      throw new Error('Database is not initialized');
+    }
+  }
+  
+
 }

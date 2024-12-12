@@ -169,7 +169,7 @@ export class OrderPage implements OnInit {
 
       if (this.selectBoard) {
         // Actualiza el estado de la mesa
-        this.selectBoard.status = 2;
+        this.selectBoard.status = 0;
         
         try {
           // Espera la respuesta de la API
