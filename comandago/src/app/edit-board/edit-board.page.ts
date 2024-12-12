@@ -25,7 +25,7 @@ export class EditBoardPage implements OnInit {
       id: ['', []],
       boardNum: ['', [Validators.required, Validators.min(1)]],
       capacity: ['', [Validators.required, Validators.min(1)]],
-      status: ['', [Validators.required]]
+      status: ['', [Validators.required, Validators.min(0)]]
     });
 
     const navigation = this.router.getCurrentNavigation();
@@ -47,7 +47,14 @@ export class EditBoardPage implements OnInit {
     if (this.boardForm.valid) {
       const editBoard = this.boardForm.value;
 
-      this.apiService.updateBoardStatus(editBoard.id, editBoard.status).subscribe(
+      if (editBoard.capacity) {
+        editBoard.capacity = Number(editBoard.capacity);
+      }
+      if (editBoard.status) {
+        editBoard.status = Number(editBoard.status);
+      }
+
+      this.apiService.editBoard(editBoard).subscribe(
         async response => {
           console.log('Mesa editada exitosamente:', response);
 
